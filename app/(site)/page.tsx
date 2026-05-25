@@ -1,7 +1,9 @@
-export default function Home() {
+import HeroSection from "@/components/blocks/HeroSection";
+
+export default function HomePage() {
   return (
-    <div className="flex flex-1 items-center justify-center">
-      <h1 className="text-2xl font-bold">Welcome to My Blog</h1>
+    <div>
+      <HeroSection />
     </div>
   );
 }
