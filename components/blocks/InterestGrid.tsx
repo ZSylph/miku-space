@@ -21,12 +21,12 @@ const iconMap: Record<string, string> = {
   Camera: "📷",
 };
 
-// 所有颜色类名字面量，确保 Tailwind JIT 扫描器能检测到
+// 颜色标识符 → Tailwind 类名（字面量供 JIT 扫描）
 const colorMap: Record<string, string> = {
-  "bg-blue-100 text-blue-700": "bg-blue-100 text-blue-700",
-  "bg-pink-100 text-pink-700": "bg-pink-100 text-pink-700",
-  "bg-green-100 text-green-700": "bg-green-100 text-green-700",
-  "bg-amber-100 text-amber-700": "bg-amber-100 text-amber-700",
+  blue: "bg-blue-100 text-blue-700",
+  pink: "bg-pink-100 text-pink-700",
+  green: "bg-green-100 text-green-700",
+  amber: "bg-amber-100 text-amber-700",
 };
 
 export default function InterestGrid({ interests }: InterestGridProps) {
