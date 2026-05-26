@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 
 interface Work {
@@ -45,9 +46,9 @@ export default function WorksPreview({ works }: WorksPreviewProps) {
           >
             <Link href={`/works/${work.slug}`}>
               <div className="group rounded-xl border bg-card p-6 hover:shadow-lg transition-shadow">
-                <div className="aspect-video rounded-lg bg-muted mb-4 flex items-center justify-center text-4xl">
+                <div className="aspect-video rounded-lg bg-muted mb-4 relative flex items-center justify-center text-4xl">
                   {work.coverUrl ? (
-                    <img src={work.coverUrl} alt={work.title} className="w-full h-full object-cover rounded-lg" />
+                    <Image src={work.coverUrl} alt={work.title} fill className="object-cover rounded-lg" />
                   ) : (
                     "🚀"
                   )}
