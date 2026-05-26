@@ -17,7 +17,18 @@
       "Bash(npm uninstall *)",
       "Bash(npm ls *)",
       "WebSearch",
-      "Bash(npx shadcn@latest add button -y)"
+      "Bash(npx shadcn@latest add button -y)",
+      "Bash(npx tsx *)",
+      "Bash(node -e \"const m = require\\('@prisma/adapter-libsql'\\); console.log\\(Object.keys\\(m\\)\\)\")",
+      "Bash(npx dotenv-cli *)",
+      "Bash(cross-env DATABASE_URL=\"file:./dev.db\" npx tsx prisma/seed.ts)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx tsx prisma/seed.ts)",
+      "Bash(node -e \"require\\('dotenv'\\).config\\(\\); console.log\\(process.env.DATABASE_URL\\)\")",
+      "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {prisma} = require\\('\\\\''./lib/prisma'\\\\''\\); prisma.interest.deleteMany\\(\\).then\\(\\(\\) => console.log\\('\\\\''ok'\\\\''\\)\\).catch\\(e => console.error\\(e\\)\\).finally\\(\\(\\) => prisma.$disconnect\\(\\)\\)')",
+      "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {prisma} = require\\('\\\\''./lib/prisma.ts'\\\\''\\); prisma.interest.deleteMany\\(\\).then\\(\\(\\) => console.log\\('\\\\''ok'\\\\''\\)\\).catch\\(e => console.error\\(e\\)\\).finally\\(\\(\\) => prisma.$disconnect\\(\\)\\)')",
+      "Bash(node -e \"const {PrismaLibSql} = require\\('@prisma/adapter-libsql'\\); console.log\\(PrismaLibSql.toString\\(\\)\\)\")",
+      "Bash(curl -s http://localhost:5555)",
+      "WebFetch(domain:localhost)"
     ]
   }
 }
