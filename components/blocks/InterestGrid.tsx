@@ -21,6 +21,14 @@ const iconMap: Record<string, string> = {
   Camera: "📷",
 };
 
+// 所有颜色类名字面量，确保 Tailwind JIT 扫描器能检测到
+const colorMap: Record<string, string> = {
+  "bg-blue-100 text-blue-700": "bg-blue-100 text-blue-700",
+  "bg-pink-100 text-pink-700": "bg-pink-100 text-pink-700",
+  "bg-green-100 text-green-700": "bg-green-100 text-green-700",
+  "bg-amber-100 text-amber-700": "bg-amber-100 text-amber-700",
+};
+
 export default function InterestGrid({ interests }: InterestGridProps) {
   return (
     <section className="container py-12">
@@ -40,7 +48,7 @@ export default function InterestGrid({ interests }: InterestGridProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            className={`rounded-xl p-6 ${interest.color} hover:scale-105 transition-transform cursor-default`}
+            className={`rounded-xl p-6 ${colorMap[interest.color] || interest.color} hover:scale-105 transition-transform cursor-default`}
           >
             <div className="text-3xl mb-3">{iconMap[interest.icon] || "✨"}</div>
             <h3 className="font-semibold text-lg mb-1">{interest.title}</h3>

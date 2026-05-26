@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -21,18 +22,18 @@ export default function HeroSection() {
           这里是我的个人空间，记录学习、分享作品、表达想法。
         </p>
         <div className="flex gap-4">
-          <a
+          <Link
             href="/works"
             className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
           >
             查看作品
-          </a>
-          <a
+          </Link>
+          <Link
             href="/about"
             className="inline-flex items-center justify-center rounded-md border border-input px-6 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             了解更多
-          </a>
+          </Link>
         </div>
       </motion.div>
     </section>
