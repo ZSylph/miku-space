@@ -28,7 +28,8 @@
       "Bash(node -e 'require\\('\\\\''dotenv'\\\\''\\).config\\(\\); const {prisma} = require\\('\\\\''./lib/prisma.ts'\\\\''\\); prisma.interest.deleteMany\\(\\).then\\(\\(\\) => console.log\\('\\\\''ok'\\\\''\\)\\).catch\\(e => console.error\\(e\\)\\).finally\\(\\(\\) => prisma.$disconnect\\(\\)\\)')",
       "Bash(node -e \"const {PrismaLibSql} = require\\('@prisma/adapter-libsql'\\); console.log\\(PrismaLibSql.toString\\(\\)\\)\")",
       "Bash(curl -s http://localhost:5555)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(curl *)"
     ]
   }
 }
