@@ -172,6 +172,10 @@
     box-shadow: 0 8px 32px rgba(168, 230, 225, 0.12);
   }
 
+  .glass-light-hover {
+    @apply transition-all duration-300;
+  }
+
   .glass-light-hover:hover {
     @apply bg-[rgba(255,255,255,0.85)] -translate-y-0.5;
     box-shadow: 0 8px 32px rgba(168, 230, 225, 0.15);
