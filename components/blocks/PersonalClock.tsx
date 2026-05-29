@@ -49,9 +49,7 @@ function pad(n: number): string {
 }
 
 export default function PersonalClock() {
-  const [timeInfo, setTimeInfo] = useState<TimeInfo>(() =>
-    getTimeInfo(new Date())
-  );
+  const [timeInfo, setTimeInfo] = useState<TimeInfo | null>(null);
 
   useEffect(() => {
     const tick = () => {
@@ -78,25 +76,29 @@ export default function PersonalClock() {
       {/* Top: period greeting + icon */}
       <div className="flex items-center gap-2 mb-4">
         <span className="text-lg" aria-hidden="true">
-          {timeInfo.period.icon}
+          {timeInfo?.period.icon ?? "🌅"}
         </span>
         <span className="text-sm font-medium text-foreground">
-          {timeInfo.period.greeting}
+          {timeInfo?.period.greeting ?? "欢迎回来"}
         </span>
       </div>
 
       {/* Time: HH:MM:SS */}
       <div className="text-[32px] font-bold font-mono tracking-tight text-foreground mb-2">
-        {pad(timeInfo.hours)}:{pad(timeInfo.minutes)}:{pad(timeInfo.seconds)}
+        {timeInfo
+          ? `${pad(timeInfo.hours)}:${pad(timeInfo.minutes)}:${pad(timeInfo.seconds)}`
+          : "--:--:--"}
       </div>
 
       {/* Date + weekday */}
       <div className="flex items-center gap-1.5 text-muted-foreground">
         <span className="text-sm">
-          {timeInfo.year}年{timeInfo.month}月{timeInfo.day}日
+          {timeInfo
+            ? `${timeInfo.year}年${timeInfo.month}月${timeInfo.day}日`
+            : "----年--月--日"}
         </span>
         <span className="text-xs opacity-50">|</span>
-        <span className="text-xs">{timeInfo.weekday}</span>
+        <span className="text-xs">{timeInfo?.weekday ?? "---"}</span>
       </div>
     </motion.div>
   );
