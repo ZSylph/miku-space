@@ -73,13 +73,13 @@ export default function LyricBar() {
     >
       <div
         className={cn(
-          "relative max-w-2xl rounded-full px-7 py-3.5",
+          "relative max-w-3xl w-full mx-auto rounded-full px-10 py-4",
           "border backdrop-blur-md",
           "bg-[rgba(168,230,225,0.08)] border-[rgba(168,230,225,0.2)]",
           "dark:bg-[rgba(255,255,255,0.05)] dark:border-[rgba(255,255,255,0.1)]"
         )}
       >
-        <div className="flex items-center justify-center min-h-[1.25rem]">
+        <div className="flex items-center justify-center min-h-[1.5rem]">
           <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
             <motion.span
               key={currentIndex}
@@ -87,7 +87,7 @@ export default function LyricBar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-sm text-center whitespace-nowrap"
+              className="text-base text-center"
             >
               <span className="text-miku-primary">{visibleText}</span>
               <span
