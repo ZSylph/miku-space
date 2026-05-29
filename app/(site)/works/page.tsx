@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
+import ContentCard from "@/components/site/ContentCard";
+import { cn } from "@/lib/utils";
 
 export default async function WorksPage() {
   const works = await prisma.work.findMany({
@@ -7,19 +8,29 @@ export default async function WorksPage() {
   });
 
   return (
-    <div className="container py-12">
-      <h1 className="text-3xl font-bold mb-8">作品展示</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-6">
+      <div
+        className={cn(
+          "rounded-3xl backdrop-blur-xl border p-6",
+          "bg-[rgba(255,255,255,0.65)] border-[rgba(168,230,225,0.25)]",
+          "dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]"
+        )}
+      >
+        <h1 className="text-[28px] font-bold text-foreground">作品展示</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          精选项目与实验性作品
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {works.map((work) => (
-          <Link key={work.id} href={`/works/${work.slug}`}>
-            <div className="rounded-xl border bg-card p-6 hover:shadow-lg transition-shadow">
-              <div className="aspect-video rounded-lg bg-muted mb-4 flex items-center justify-center text-4xl">
-                🚀
-              </div>
-              <h2 className="font-semibold text-lg">{work.title}</h2>
-              <p className="text-sm text-muted-foreground mt-1">{work.description}</p>
-            </div>
-          </Link>
+          <ContentCard
+            key={work.id}
+            item={work}
+            href={`/works/${work.slug}`}
+            variant="grid"
+            aspectVideo
+          />
         ))}
       </div>
     </div>
