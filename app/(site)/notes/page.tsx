@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
+import ContentCard from "@/components/site/ContentCard";
+import { cn } from "@/lib/utils";
 
 export default async function NotesPage() {
   const notes = await prisma.note.findMany({
@@ -8,25 +9,29 @@ export default async function NotesPage() {
   });
 
   return (
-    <div className="container py-12">
-      <h1 className="text-3xl font-bold mb-8">学习笔记</h1>
-      <div className="space-y-4">
+    <div className="space-y-6">
+      <div
+        className={cn(
+          "rounded-3xl backdrop-blur-xl border p-6",
+          "bg-[rgba(255,255,255,0.65)] border-[rgba(168,230,225,0.25)]",
+          "dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]"
+        )}
+      >
+        <h1 className="text-[28px] font-bold text-foreground">学习笔记</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          零散的知识记录与备忘
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4">
         {notes.map((note) => (
-          <Link key={note.id} href={`/notes/${note.slug}`}>
-            <div className="rounded-lg border p-6 hover:bg-accent transition-colors">
-              <div className="flex items-center gap-2 mb-2">
-                {note.category && (
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-secondary">
-                    {note.category}
-                  </span>
-                )}
-              </div>
-              <h2 className="font-semibold text-lg">{note.title}</h2>
-              <p className="text-xs text-muted-foreground mt-3">
-                {new Date(note.createdAt).toLocaleDateString("zh-CN")}
-              </p>
-            </div>
-          </Link>
+          <ContentCard
+            key={note.id}
+            item={note}
+            href={`/notes/${note.slug}`}
+            variant="list"
+            showCategory
+          />
         ))}
       </div>
     </div>
