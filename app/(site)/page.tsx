@@ -3,7 +3,7 @@ import PetalParticles from "@/components/effects/PetalParticles";
 import FloatingOrbs from "@/components/effects/FloatingOrbs";
 import HeroSection from "@/components/blocks/HeroSection";
 import LyricBar from "@/components/blocks/LyricBar";
-import InterestGrid from "@/components/blocks/InterestGrid";
+import InterestCarousel from "@/components/blocks/InterestCarousel";
 import WorksPreview from "@/components/blocks/WorksPreview";
 import ContentFeed from "@/components/blocks/ContentFeed";
 
@@ -53,7 +53,7 @@ export default async function HomePage() {
           stats={{ posts: postCount, notes: noteCount, works: workCount }}
         />
         <LyricBar />
-        <InterestGrid interests={interests} />
+        <InterestCarousel interests={interests} />
         <WorksPreview works={works} />
         <ContentFeed items={contentItems} />
       </div>
