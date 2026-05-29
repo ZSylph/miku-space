@@ -1,0 +1,81 @@
+import { prisma } from "@/lib/prisma";
+import { requireAdminAuth } from "@/lib/admin-auth";
+import { postUpdateSchema } from "@/lib/validation";
+import { ApiResponse } from "@/lib/api-utils";
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authError = await requireAdminAuth();
+  if (authError) return authError;
+
+  const { id } = await params;
+  const post = await prisma.post.findUnique({ where: { id } });
+
+  if (!post) {
+    return ApiResponse.notFound();
+  }
+
+  return ApiResponse.ok(post);
+}
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authError = await requireAdminAuth();
+  if (authError) return authError;
+
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const parsed = postUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return ApiResponse.badRequest(parsed.error.issues[0].message);
+    }
+    const { title, slug, content, excerpt, coverUrl, published } = parsed.data;
+
+    if (slug) {
+      const existing = await prisma.post.findFirst({
+        where: { slug, NOT: { id } },
+      });
+      if (existing) {
+        return ApiResponse.conflict("Slug already exists");
+      }
+    }
+
+    const data: Record<string, unknown> = {};
+    if (title !== undefined) data.title = title;
+    if (slug !== undefined) data.slug = slug;
+    if (content !== undefined) data.content = content;
+    if (excerpt !== undefined) data.excerpt = excerpt;
+    if (coverUrl !== undefined) data.coverUrl = coverUrl;
+    if (published !== undefined) data.published = published;
+
+    const post = await prisma.post.update({ where: { id }, data });
+    return ApiResponse.ok(post);
+  } catch {
+    return ApiResponse.serverError("Failed to update post");
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authError = await requireAdminAuth();
+  if (authError) return authError;
+
+  try {
+    const { id } = await params;
+    await prisma.post.update({
+      where: { id },
+      data: { tags: { set: [] } },
+    });
+    await prisma.post.delete({ where: { id } });
+    return ApiResponse.ok({ success: true });
+  } catch {
+    return ApiResponse.serverError("Failed to delete post");
+  }
+}

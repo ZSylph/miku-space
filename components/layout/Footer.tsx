@@ -13,7 +13,7 @@ export default function Footer() {
         className={cn(
           "flex flex-col items-center justify-center gap-3 rounded-2xl backdrop-blur-xl px-6 py-8",
           "bg-[rgba(255,255,255,0.5)] border border-[rgba(168,230,225,0.2)]",
-          "dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]"
+          "dark:bg-dark-card dark:border-dark-border",
         )}
       >
         {/* Line 1: ICP */}
