@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import PetalParticles from "@/components/effects/PetalParticles";
+import FloatingOrbs from "@/components/effects/FloatingOrbs";
 import HeroSection from "@/components/blocks/HeroSection";
 import LyricBar from "@/components/blocks/LyricBar";
 import InterestGrid from "@/components/blocks/InterestGrid";
@@ -43,14 +45,18 @@ export default async function HomePage() {
     .slice(0, 5);
 
   return (
-    <div>
-      <HeroSection
-        stats={{ posts: postCount, notes: noteCount, works: workCount }}
-      />
-      <LyricBar />
-      <InterestGrid interests={interests} />
-      <WorksPreview works={works} />
-      <ContentFeed items={contentItems} />
-    </div>
+    <>
+      <PetalParticles />
+      <FloatingOrbs />
+      <div className="relative z-10">
+        <HeroSection
+          stats={{ posts: postCount, notes: noteCount, works: workCount }}
+        />
+        <LyricBar />
+        <InterestGrid interests={interests} />
+        <WorksPreview works={works} />
+        <ContentFeed items={contentItems} />
+      </div>
+    </>
   );
 }
