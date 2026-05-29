@@ -188,4 +188,93 @@
   .bg-gradient-miku {
     @apply bg-gradient-to-br from-miku-primary to-miku-primary-light;
   }
+
+  .prose-custom {
+    @apply text-foreground;
+  }
+
+  .prose-custom :where(h1, h2, h3, h4, h5, h6) {
+    @apply text-foreground font-bold tracking-tight;
+  }
+
+  .prose-custom h1 {
+    @apply text-[28px] mb-6 mt-2;
+  }
+
+  .prose-custom h2 {
+    @apply text-[22px] mb-4 mt-8 pb-2 border-b border-[rgba(168,230,225,0.15)];
+  }
+
+  .prose-custom h3 {
+    @apply text-lg mb-3 mt-6;
+  }
+
+  .prose-custom p {
+    @apply text-base leading-[1.8] mb-5;
+  }
+
+  .prose-custom a {
+    @apply text-miku-primary-dark transition-colors hover:underline;
+  }
+
+  .prose-custom blockquote {
+    @apply border-l-[3px] border-miku-primary bg-[rgba(168,230,225,0.06)] rounded-xl px-5 py-4 my-6 not-italic;
+  }
+
+  .prose-custom blockquote p {
+    @apply mb-0;
+  }
+
+  .prose-custom ul {
+    @apply list-disc pl-6 mb-5 space-y-1.5;
+  }
+
+  .prose-custom ol {
+    @apply list-decimal pl-6 mb-5 space-y-1.5;
+  }
+
+  .prose-custom li {
+    @apply text-base leading-relaxed;
+  }
+
+  .prose-custom li::marker {
+    @apply text-miku-primary;
+  }
+
+  .prose-custom code {
+    @apply bg-[rgba(168,230,225,0.12)] text-miku-primary-dark rounded-md px-1.5 py-0.5 text-sm font-mono;
+  }
+
+  .prose-custom pre {
+    @apply bg-[rgba(168,230,225,0.06)] dark:bg-[rgba(0,0,0,0.25)] rounded-xl p-5 my-6 overflow-x-auto border border-[rgba(168,230,225,0.1)];
+  }
+
+  .prose-custom pre code {
+    @apply bg-transparent text-foreground p-0 text-sm;
+  }
+
+  .prose-custom hr {
+    @apply border-[rgba(168,230,225,0.15)] my-8;
+  }
+
+  .prose-custom table {
+    @apply w-full text-sm my-6 border-collapse;
+  }
+
+  .prose-custom th,
+  .prose-custom td {
+    @apply border border-[rgba(168,230,225,0.15)] px-4 py-2.5 text-left;
+  }
+
+  .prose-custom th {
+    @apply font-semibold bg-[rgba(168,230,225,0.08)] text-foreground;
+  }
+
+  .prose-custom img {
+    @apply rounded-xl my-6;
+  }
+
+  .prose-custom strong {
+    @apply text-foreground font-semibold;
+  }
 }
