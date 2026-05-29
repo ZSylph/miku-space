@@ -4,8 +4,10 @@ import FloatingOrbs from "@/components/effects/FloatingOrbs";
 import HeroSection from "@/components/blocks/HeroSection";
 import LyricBar from "@/components/blocks/LyricBar";
 import InterestCarousel from "@/components/blocks/InterestCarousel";
-import WorksPreview from "@/components/blocks/WorksPreview";
-import ContentFeed from "@/components/blocks/ContentFeed";
+import PersonalClock from "@/components/blocks/PersonalClock";
+import VerticalGallery from "@/components/blocks/VerticalGallery";
+import FeaturedWorks from "@/components/blocks/FeaturedWorks";
+import LatestContent from "@/components/blocks/LatestContent";
 
 export default async function HomePage() {
   const [interests, works, posts, notes, postCount, noteCount, workCount] =
@@ -53,9 +55,19 @@ export default async function HomePage() {
           stats={{ posts: postCount, notes: noteCount, works: workCount }}
         />
         <LyricBar />
-        <InterestCarousel interests={interests} />
-        <WorksPreview works={works} />
-        <ContentFeed items={contentItems} />
+
+        <div className="flex flex-col lg:flex-row gap-5 py-6">
+          <div className="flex flex-col gap-5 lg:w-[40%]">
+            <InterestCarousel interests={interests} />
+            <PersonalClock />
+            <VerticalGallery />
+          </div>
+
+          <div className="flex flex-col gap-5 lg:w-[60%]">
+            <FeaturedWorks works={works} />
+            <LatestContent items={contentItems} />
+          </div>
+        </div>
       </div>
     </>
   );
