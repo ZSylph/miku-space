@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import HeroSection from "@/components/blocks/HeroSection";
+import LyricBar from "@/components/blocks/LyricBar";
 import InterestGrid from "@/components/blocks/InterestGrid";
 import WorksPreview from "@/components/blocks/WorksPreview";
 import ContentFeed from "@/components/blocks/ContentFeed";
@@ -46,6 +47,7 @@ export default async function HomePage() {
       <HeroSection
         stats={{ posts: postCount, notes: noteCount, works: workCount }}
       />
+      <LyricBar />
       <InterestGrid interests={interests} />
       <WorksPreview works={works} />
       <ContentFeed items={contentItems} />
