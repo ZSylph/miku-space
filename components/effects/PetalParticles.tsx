@@ -88,7 +88,7 @@ export default function PetalParticles() {
     let height = window.innerHeight;
 
     function resize() {
-      if (!canvas) return;
+      if (!canvas || !ctx) return;
       dpr = window.devicePixelRatio || 1;
       width = window.innerWidth;
       height = window.innerHeight;
@@ -96,7 +96,7 @@ export default function PetalParticles() {
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      ctx?.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     resize();
