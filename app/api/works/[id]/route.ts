@@ -58,7 +58,11 @@ export async function PUT(
 
     const work = await prisma.work.update({ where: { id }, data });
     return ApiResponse.ok(work);
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Work not found");
+    }
+    console.error("[works:PUT] Failed to update work:", err);
     return ApiResponse.serverError("Failed to update work");
   }
 }
@@ -74,7 +78,11 @@ export async function DELETE(
     const { id } = await params;
     await prisma.work.delete({ where: { id } });
     return ApiResponse.ok({ success: true });
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Work not found");
+    }
+    console.error("[works:DELETE] Failed to delete work:", err);
     return ApiResponse.serverError("Failed to delete work");
   }
 }

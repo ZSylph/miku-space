@@ -46,7 +46,8 @@ export async function POST(request: Request) {
     });
 
     return ApiResponse.created(work);
-  } catch {
+  } catch (err) {
+    console.error("[works:POST] Failed to create work:", err);
     return ApiResponse.serverError("Failed to create work");
   }
 }

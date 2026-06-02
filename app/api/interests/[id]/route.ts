@@ -46,7 +46,11 @@ export async function PUT(
 
     const interest = await prisma.interest.update({ where: { id }, data });
     return ApiResponse.ok(interest);
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Interest not found");
+    }
+    console.error("[interests:PUT] Failed to update interest:", err);
     return ApiResponse.serverError("Failed to update interest");
   }
 }
@@ -62,7 +66,11 @@ export async function DELETE(
     const { id } = await params;
     await prisma.interest.delete({ where: { id } });
     return ApiResponse.ok({ success: true });
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Interest not found");
+    }
+    console.error("[interests:DELETE] Failed to delete interest:", err);
     return ApiResponse.serverError("Failed to delete interest");
   }
 }

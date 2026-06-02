@@ -43,7 +43,8 @@ export async function POST(request: Request) {
     });
 
     return ApiResponse.created(post);
-  } catch {
+  } catch (err) {
+    console.error("[posts:POST] Failed to create post:", err);
     return ApiResponse.serverError("Failed to create post");
   }
 }

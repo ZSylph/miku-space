@@ -38,7 +38,8 @@ export async function POST(request: Request) {
     });
 
     return ApiResponse.created(interest);
-  } catch {
+  } catch (err) {
+    console.error("[interests:POST] Failed to create interest:", err);
     return ApiResponse.serverError("Failed to create interest");
   }
 }
