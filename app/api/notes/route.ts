@@ -43,7 +43,8 @@ export async function POST(request: Request) {
     });
 
     return ApiResponse.created(note);
-  } catch {
+  } catch (err) {
+    console.error("[notes:POST] Failed to create note:", err);
     return ApiResponse.serverError("Failed to create note");
   }
 }

@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
 export function hashPassword(password: string): string {
@@ -26,9 +25,16 @@ export function verifyCredentials(username: string, password: string): boolean {
     return false;
   }
 
-  if (username !== adminUsername) {
+  // Timing-safe comparison for username
+  if (username.length !== adminUsername.length) {
+    // Still verify password to avoid leaking username length info via timing
+    verifyPassword(password, adminPasswordHash);
     return false;
   }
+  const usernameMatch = timingSafeEqual(
+    Buffer.from(username),
+    Buffer.from(adminUsername),
+  );
 
-  return verifyPassword(password, adminPasswordHash);
+  return usernameMatch && verifyPassword(password, adminPasswordHash);
 }

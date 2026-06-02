@@ -55,7 +55,11 @@ export async function PUT(
 
     const note = await prisma.note.update({ where: { id }, data });
     return ApiResponse.ok(note);
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Note not found");
+    }
+    console.error("[notes:PUT] Failed to update note:", err);
     return ApiResponse.serverError("Failed to update note");
   }
 }
@@ -69,13 +73,16 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await prisma.note.update({
-      where: { id },
-      data: { tags: { set: [] } },
-    });
-    await prisma.note.delete({ where: { id } });
+    await prisma.$transaction([
+      prisma.note.update({ where: { id }, data: { tags: { set: [] } } }),
+      prisma.note.delete({ where: { id } }),
+    ]);
     return ApiResponse.ok({ success: true });
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Note not found");
+    }
+    console.error("[notes:DELETE] Failed to delete note:", err);
     return ApiResponse.serverError("Failed to delete note");
   }
 }

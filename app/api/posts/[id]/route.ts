@@ -55,7 +55,11 @@ export async function PUT(
 
     const post = await prisma.post.update({ where: { id }, data });
     return ApiResponse.ok(post);
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Post not found");
+    }
+    console.error("[posts:PUT] Failed to update post:", err);
     return ApiResponse.serverError("Failed to update post");
   }
 }
@@ -69,13 +73,16 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await prisma.post.update({
-      where: { id },
-      data: { tags: { set: [] } },
-    });
-    await prisma.post.delete({ where: { id } });
+    await prisma.$transaction([
+      prisma.post.update({ where: { id }, data: { tags: { set: [] } } }),
+      prisma.post.delete({ where: { id } }),
+    ]);
     return ApiResponse.ok({ success: true });
-  } catch {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      return ApiResponse.notFound("Post not found");
+    }
+    console.error("[posts:DELETE] Failed to delete post:", err);
     return ApiResponse.serverError("Failed to delete post");
   }
 }
