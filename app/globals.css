@@ -7,27 +7,29 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-outfit, "Outfit"), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-sans:
+    var(--font-outfit, "Outfit"), "PingFang SC", "Microsoft YaHei", system-ui,
+    sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
 
   /* Miku Space Custom Colors */
-  --color-miku-primary: #A8E6E1;
-  --color-miku-primary-light: #C8F0EC;
-  --color-miku-primary-dark: #7DD9D2;
-  --color-miku-pink: #F5C6D0;
-  --color-miku-cyan: #C8F0EC;
+  --color-miku-primary: #a8e6e1;
+  --color-miku-primary-light: #c8f0ec;
+  --color-miku-primary-dark: #7dd9d2;
+  --color-miku-pink: #f5c6d0;
+  --color-miku-cyan: #c8f0ec;
 
   /* Dark mode backgrounds */
-  --color-dark-base: #0D0D1A;
+  --color-dark-base: #0d0d1a;
   --color-dark-card: rgba(255, 255, 255, 0.04);
   --color-dark-card-hover: rgba(255, 255, 255, 0.06);
   --color-dark-border: rgba(255, 255, 255, 0.08);
 
   /* Light mode backgrounds */
-  --color-light-base: #FFF5F7;
-  --color-light-blue-tint: #F0F8FF;
-  --color-light-cyan-tint: #F0FFFE;
+  --color-light-base: #fff5f7;
+  --color-light-blue-tint: #f0f8ff;
+  --color-light-cyan-tint: #f0fffe;
   --color-light-card: rgba(255, 255, 255, 0.65);
   --color-light-card-hover: rgba(255, 255, 255, 0.85);
   --color-light-border: rgba(168, 230, 225, 0.25);
@@ -72,75 +74,75 @@
 }
 
 :root {
-  --background: #FFF5F7;
-  --foreground: #2D2D3A;
+  --background: #fff5f7;
+  --foreground: #2d2d3a;
   --card: rgba(255, 255, 255, 0.65);
-  --card-foreground: #2D2D3A;
+  --card-foreground: #2d2d3a;
   --popover: rgba(255, 255, 255, 0.8);
-  --popover-foreground: #2D2D3A;
-  --primary: #A8E6E1;
-  --primary-foreground: #2D2D3A;
+  --popover-foreground: #2d2d3a;
+  --primary: #a8e6e1;
+  --primary-foreground: #2d2d3a;
   --secondary: rgba(168, 230, 225, 0.15);
-  --secondary-foreground: #2D2D3A;
+  --secondary-foreground: #2d2d3a;
   --muted: rgba(168, 230, 225, 0.1);
-  --muted-foreground: #8A8A9A;
+  --muted-foreground: #8a8a9a;
   --accent: rgba(168, 230, 225, 0.15);
-  --accent-foreground: #2D2D3A;
-  --destructive: #F5C6D0;
-  --destructive-foreground: #2D2D3A;
+  --accent-foreground: #2d2d3a;
+  --destructive: #f5c6d0;
+  --destructive-foreground: #2d2d3a;
   --border: rgba(168, 230, 225, 0.25);
   --input: rgba(168, 230, 225, 0.2);
-  --ring: #A8E6E1;
+  --ring: #a8e6e1;
   --radius: 0.75rem;
   --chart-1: 0 0% 0%;
   --chart-2: 0 0% 0%;
   --chart-3: 0 0% 0%;
   --chart-4: 0 0% 0%;
   --chart-5: 0 0% 0%;
-  --sidebar: #FFF5F7;
-  --sidebar-foreground: #2D2D3A;
-  --sidebar-primary: #A8E6E1;
-  --sidebar-primary-foreground: #2D2D3A;
+  --sidebar: #fff5f7;
+  --sidebar-foreground: #2d2d3a;
+  --sidebar-primary: #a8e6e1;
+  --sidebar-primary-foreground: #2d2d3a;
   --sidebar-accent: rgba(168, 230, 225, 0.15);
-  --sidebar-accent-foreground: #2D2D3A;
+  --sidebar-accent-foreground: #2d2d3a;
   --sidebar-border: rgba(168, 230, 225, 0.25);
-  --sidebar-ring: #A8E6E1;
+  --sidebar-ring: #a8e6e1;
 }
 
 .dark {
-  --background: #0D0D1A;
-  --foreground: #FFFFFF;
+  --background: #0d0d1a;
+  --foreground: #ffffff;
   --card: rgba(255, 255, 255, 0.04);
-  --card-foreground: #FFFFFF;
+  --card-foreground: #ffffff;
   --popover: rgba(255, 255, 255, 0.06);
-  --popover-foreground: #FFFFFF;
-  --primary: #A8E6E1;
-  --primary-foreground: #0D0D1A;
+  --popover-foreground: #ffffff;
+  --primary: #a8e6e1;
+  --primary-foreground: #0d0d1a;
   --secondary: rgba(255, 255, 255, 0.06);
-  --secondary-foreground: #FFFFFF;
+  --secondary-foreground: #ffffff;
   --muted: rgba(255, 255, 255, 0.04);
-  --muted-foreground: #8A8A9A;
+  --muted-foreground: #8a8a9a;
   --accent: rgba(255, 255, 255, 0.06);
-  --accent-foreground: #FFFFFF;
-  --destructive: #F5C6D0;
-  --destructive-foreground: #0D0D1A;
+  --accent-foreground: #ffffff;
+  --destructive: #f5c6d0;
+  --destructive-foreground: #0d0d1a;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.08);
-  --ring: #A8E6E1;
+  --ring: #a8e6e1;
   --radius: 0.75rem;
   --chart-1: 0 0% 0%;
   --chart-2: 0 0% 0%;
   --chart-3: 0 0% 0%;
   --chart-4: 0 0% 0%;
   --chart-5: 0 0% 0%;
-  --sidebar: #0D0D1A;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #A8E6E1;
-  --sidebar-primary-foreground: #0D0D1A;
+  --sidebar: #0d0d1a;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #a8e6e1;
+  --sidebar-primary-foreground: #0d0d1a;
   --sidebar-accent: rgba(255, 255, 255, 0.06);
-  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #A8E6E1;
+  --sidebar-ring: #a8e6e1;
 }
 
 @layer base {
@@ -165,7 +167,7 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-miku-primary to-miku-primary-light bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-miku-primary to-miku-primary-light bg-clip-text text-transparent;
   }
 
   .prose-custom {
