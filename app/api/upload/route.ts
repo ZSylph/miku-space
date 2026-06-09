@@ -3,7 +3,7 @@ import { join } from "path";
 import { randomBytes } from "crypto";
 import { requireAdminAuth } from "@/lib/admin-auth";
 import { ApiResponse } from "@/lib/api-utils";
-import { isR2Enabled, uploadToR2 } from "@/lib/r2";
+import { isBlobEnabled, uploadToBlob } from "@/lib/blob";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;   // 5MB
 const MAX_AUDIO_SIZE = 30 * 1024 * 1024;  // 30MB
@@ -78,10 +78,10 @@ async function saveLocal(filename: string, buffer: Buffer): Promise<string> {
   return `/uploads/${filename}`;
 }
 
-/** Save to Cloudflare R2 (production) */
-async function saveR2(filename: string, buffer: Buffer, contentType: string): Promise<string> {
-  const key = `uploads/${filename}`;
-  return uploadToR2(key, buffer, contentType);
+/** Save to Vercel Blob (production) */
+async function saveBlob(filename: string, buffer: Buffer, contentType: string): Promise<string> {
+  const pathname = `uploads/${filename}`;
+  return uploadToBlob(pathname, buffer, contentType);
 }
 
 export async function POST(request: Request) {
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const type = (formData.get("type") as string) || "image";
-    const useR2 = isR2Enabled();
+    const useBlob = isBlobEnabled();
 
     if (!file) {
       return ApiResponse.badRequest("No file provided");
@@ -115,8 +115,8 @@ export async function POST(request: Request) {
       const random = randomBytes(8).toString("hex");
       const filename = `${timestamp}-${random}.${audioFormat}`;
 
-      const url = useR2
-        ? await saveR2(filename, buffer, AUDIO_CONTENT_TYPES[audioFormat] || "audio/mpeg")
+      const url = useBlob
+        ? await saveBlob(filename, buffer, AUDIO_CONTENT_TYPES[audioFormat] || "audio/mpeg")
         : await saveLocal(filename, buffer);
 
       return ApiResponse.ok({ url });
@@ -140,8 +140,8 @@ export async function POST(request: Request) {
     const random = randomBytes(8).toString("hex");
     const filename = `${timestamp}-${random}.${ext}`;
 
-    const url = useR2
-      ? await saveR2(filename, buffer, IMAGE_CONTENT_TYPES[ext] || "image/jpeg")
+    const url = useBlob
+      ? await saveBlob(filename, buffer, IMAGE_CONTENT_TYPES[ext] || "image/jpeg")
       : await saveLocal(filename, buffer);
 
     return ApiResponse.ok({ url });

@@ -1,7 +1,7 @@
 import { unlink, readdir, stat } from "fs/promises";
 import { join } from "path";
 import { prisma } from "@/lib/prisma";
-import { isR2Enabled, listR2Uploads, deleteFromR2, getR2PublicUrl } from "@/lib/r2";
+import { isBlobEnabled, listBlobUploads, deleteFromBlob } from "@/lib/blob";
 
 const UPLOADS_DIR = join(process.cwd(), "public", "uploads");
 
@@ -9,22 +9,16 @@ const UPLOADS_DIR = join(process.cwd(), "public", "uploads");
  *  Helpers
  * ────────────────────────────────────────────── */
 
-/** Check if a URL is a managed upload (local /uploads/ or R2). */
-function isManagedUrl(url: string): boolean {
-  if (url.startsWith("/uploads/")) return true;
-  const r2Base = getR2PublicUrl();
-  if (r2Base && url.startsWith(`${r2Base}/uploads/`)) return true;
-  return false;
+/** Check if a URL is a Vercel Blob URL. */
+function isBlobUrl(url: string): boolean {
+  return url.includes(".blob.vercel-storage.com/");
 }
 
-/** Extract the object key from any managed URL. */
-function urlToKey(url: string): string | null {
-  if (url.startsWith("/uploads/")) return `uploads/${url.slice("/uploads/".length)}`;
-  const r2Base = getR2PublicUrl();
-  if (r2Base && url.startsWith(`${r2Base}/uploads/`)) {
-    return url.slice(`${r2Base}/`.length);
-  }
-  return null;
+/** Check if a URL is a managed upload (local /uploads/ or Vercel Blob). */
+function isManagedUrl(url: string): boolean {
+  if (url.startsWith("/uploads/")) return true;
+  if (isBlobUrl(url)) return true;
+  return false;
 }
 
 /* ──────────────────────────────────────────────
@@ -36,9 +30,8 @@ export async function deleteUploadFile(
 ): Promise<void> {
   if (!url || !isManagedUrl(url)) return;
 
-  if (isR2Enabled() && url.startsWith(getR2PublicUrl())) {
-    const key = urlToKey(url);
-    if (key) await deleteFromR2(key);
+  if (isBlobEnabled() && isBlobUrl(url)) {
+    await deleteFromBlob(url);
     return;
   }
 
@@ -93,19 +86,17 @@ export async function cleanupOrphanUploads(
   const used = await collectAllUsedUrls();
   const deleted: string[] = [];
 
-  if (isR2Enabled()) {
-    const objects = await listR2Uploads();
-    const r2Base = getR2PublicUrl();
+  if (isBlobEnabled()) {
+    const blobs = await listBlobUploads();
 
-    for (const obj of objects) {
-      const fullUrl = `${r2Base}/${obj.key}`;
-      if (used.has(fullUrl)) continue;
+    for (const blob of blobs) {
+      if (used.has(blob.url)) continue;
 
       // Grace period
-      if (obj.lastModified && Date.now() - obj.lastModified.getTime() < gracePeriodMs) continue;
+      if (blob.uploadedAt && Date.now() - blob.uploadedAt.getTime() < gracePeriodMs) continue;
 
-      await deleteFromR2(obj.key);
-      deleted.push(obj.key);
+      await deleteFromBlob(blob.url);
+      deleted.push(blob.pathname);
     }
     return { deleted };
   }

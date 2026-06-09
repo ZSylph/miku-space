@@ -28,7 +28,7 @@ English documentation: [README.en.md](README.en.md)
 
 - 后台支持文章、笔记、作品、兴趣、歌曲等内容类型的创建、编辑、排序与删除。
 - 支持草稿 / 发布状态管理，便于内容分阶段上线。
-- 支持图片与音频上传，开发环境保存至本地 `public/uploads/`，生产环境自动切换至 Cloudflare R2。
+- 支持图片与音频上传，开发环境保存至本地 `public/uploads/`，生产环境自动切换至 Vercel Blob。
 - 支持拖拽排序与精选标记，适合维护首页和专题内容展示。
 - 后台登录采用基于 Cookie 的认证方案，并使用 HMAC 签名保护会话。
 
@@ -36,7 +36,7 @@ English documentation: [README.en.md](README.en.md)
 
 - 使用 Prisma + libSQL 适配器管理数据库，开发环境使用本地 SQLite，生产环境对接 Turso 云数据库。
 - 采用 Next.js Standalone 输出，适合 Vercel 或 Node.js 服务器部署。
-- 文件存储支持本地磁盘与 Cloudflare R2 双模式，通过环境变量自动切换。
+- 文件存储支持本地磁盘与 Vercel Blob 双模式，通过环境变量自动切换。
 - 配置了 ESLint、TypeScript 与 Tailwind CSS 4 的现代前端工程链路。
 
 ## 技术栈
@@ -46,7 +46,7 @@ English documentation: [README.en.md](README.en.md)
 - **内容**: React Markdown + remark-gfm
 - **数据库**: SQLite (dev) / Turso libSQL (prod)
 - **ORM**: Prisma 7.8.0 + @prisma/adapter-libsql
-- **存储**: 本地磁盘 (dev) / Cloudflare R2 (prod, @aws-sdk/client-s3)
+- **存储**: 本地磁盘 (dev) / Vercel Blob (prod, @vercel/blob)
 - **类型**: TypeScript 5, Zod 校验
 
 ## 快速开始
@@ -103,17 +103,13 @@ npm run dev
 | `ADMIN_PASSWORD_HASH` | 是   | 密码 scrypt 哈希值                           |
 | `ADMIN_SECRET`        | 是   | Session Cookie HMAC 签名密钥，建议 64 位 hex |
 
-### Cloudflare R2 对象存储（生产环境）
+### Vercel Blob 对象存储（生产环境）
 
-| 变量名                 | 必填     | 说明                        |
-| ---------------------- | -------- | --------------------------- |
-| `R2_ENDPOINT`          | 生产必填 | R2 S3 兼容 API 端点         |
-| `R2_ACCESS_KEY_ID`     | 生产必填 | R2 API Access Key ID        |
-| `R2_SECRET_ACCESS_KEY` | 生产必填 | R2 API Secret Access Key    |
-| `R2_BUCKET_NAME`       | 否       | Bucket 名称，默认 `uploads` |
-| `R2_PUBLIC_URL`        | 生产必填 | R2 公共访问域名或自定义域名 |
+| 变量名                    | 必填     | 说明                                                 |
+| ------------------------- | -------- | ---------------------------------------------------- |
+| `BLOB_READ_WRITE_TOKEN`   | 生产必填 | Vercel Blob 读写令牌，在 Vercel 项目 Storage 中自动获取 |
 
-> 本地开发无需配置 R2 变量，文件会自动保存到 `public/uploads/`。
+> 本地开发无需配置 Blob 变量，文件会自动保存到 `public/uploads/`。
 
 ### 生成密钥
 
@@ -164,8 +160,8 @@ lib/
   prisma.ts            Prisma 客户端单例（libSQL 适配器）
   auth.ts              密码 scrypt 哈希与验证
   admin-auth.ts        后台 HMAC 会话签发与校验
-  r2.ts                Cloudflare R2 S3 客户端与操作
-  file-cleanup.ts      上传文件孤儿清理（本地/R2 双模式）
+  blob.ts              Vercel Blob 客户端与操作
+  file-cleanup.ts      上传文件孤儿清理（本地/Blob 双模式）
   site-config.ts       站点全局配置（社交链接、SEO 等）
   validation.ts        Zod 表单校验规则
   api-utils.ts         API 响应辅助函数
@@ -190,7 +186,7 @@ public/
 
 ## 部署指南
 
-推荐部署方案：**Vercel + Turso + Cloudflare R2**。
+推荐部署方案：**Vercel + Turso + Vercel Blob**。
 
 ### 1. 创建 Turso 数据库
 
@@ -217,13 +213,11 @@ sqlite3 dev.db .dump > dump.sql
 turso db shell miku-space < dump.sql
 ```
 
-### 3. 创建 Cloudflare R2 Bucket
+### 3. 启用 Vercel Blob
 
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. 进入 R2 Object Storage，创建 Bucket（如 `miku-uploads`）
-3. 创建 API Token（Object Read & Write 权限）
-4. 记录 Endpoint、Access Key ID、Secret Access Key
-5. （可选）为 Bucket 绑定自定义域名，启用公共访问
+1. 进入 Vercel 项目 Settings → Storage
+2. 点击 Create Database，选择 Blob 类型
+3. 创建完成后，`BLOB_READ_WRITE_TOKEN` 会自动注入到项目环境变量中
 
 ### 4. 部署到 Vercel
 
@@ -244,11 +238,6 @@ ADMIN_SECRET=your-random-secret
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=your-scrypt-hash
 SITE_URL=https://your-domain.com
-R2_ENDPOINT=https://xxx.r2.cloudflarestorage.com
-R2_ACCESS_KEY_ID=xxx
-R2_SECRET_ACCESS_KEY=xxx
-R2_BUCKET_NAME=miku-uploads
-R2_PUBLIC_URL=https://your-r2-domain.com
 ```
 
 ### 5. 推送 Schema 到生产数据库
@@ -275,7 +264,7 @@ npx prisma db push
 - 修改后台账号或密钥后，请同步更新 Vercel 环境变量并重新部署。
 - 调整 Prisma Schema 后，执行 `npx prisma db push`（生产）或 `npx prisma migrate dev`（开发）。
 - 如果启用了自定义域名或外部图片源，请确认 `next.config.ts` 的 `remotePatterns` 与部署域名一致。
-- 上传文件在本地开发时保存到 `public/uploads/`，生产环境自动使用 R2，无需修改代码。
+- 上传文件在本地开发时保存到 `public/uploads/`，生产环境自动使用 Vercel Blob，无需修改代码。
 
 ## 许可证
 

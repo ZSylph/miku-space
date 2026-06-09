@@ -28,7 +28,7 @@ Chinese version: [README.md](README.md)
 
 - The admin area supports creating, editing, reordering, and deleting posts, notes, works, interests, and songs.
 - Draft and published states make staged publishing easier.
-- Image and audio uploads use local storage in development and switch to Cloudflare R2 in production.
+- Image and audio uploads use local storage in development and switch to Vercel Blob in production.
 - Drag sorting and featured flags help maintain the homepage and curated sections.
 - Admin login uses a cookie-based auth flow protected with an HMAC signature.
 
@@ -36,7 +36,7 @@ Chinese version: [README.md](README.md)
 
 - Prisma with the libSQL adapter powers the database layer, using local SQLite in development and Turso in production.
 - Next.js standalone output keeps deployment flexible for Vercel or a Node.js server.
-- File storage supports both local disk and Cloudflare R2 through environment-driven switching.
+- File storage supports both local disk and Vercel Blob through environment-driven switching.
 - ESLint, TypeScript, and Tailwind CSS 4 provide the project tooling stack.
 
 ## Tech Stack
@@ -46,7 +46,7 @@ Chinese version: [README.md](README.md)
 - Content: React Markdown with remark-gfm
 - Database: SQLite in development, Turso libSQL in production
 - ORM: Prisma 7.8.0 with @prisma/adapter-libsql
-- Storage: Local disk in development, Cloudflare R2 in production
+- Storage: Local disk in development, Vercel Blob in production
 - Types: TypeScript 5 and Zod validation
 
 ## Quick Start
@@ -103,17 +103,13 @@ Create a `.env` file in the project root and configure the following groups.
 | `ADMIN_PASSWORD_HASH` | Yes      | Password scrypt hash                                       |
 | `ADMIN_SECRET`        | Yes      | HMAC signing key for session cookies, ideally 64 hex chars |
 
-### Cloudflare R2
+### Vercel Blob
 
-| Variable               | Required               | Description                            |
-| ---------------------- | ---------------------- | -------------------------------------- |
-| `R2_ENDPOINT`          | Required in production | R2 S3-compatible API endpoint          |
-| `R2_ACCESS_KEY_ID`     | Required in production | R2 API Access Key ID                   |
-| `R2_SECRET_ACCESS_KEY` | Required in production | R2 API Secret Access Key               |
-| `R2_BUCKET_NAME`       | No                     | Bucket name, defaults to `uploads`     |
-| `R2_PUBLIC_URL`        | Required in production | Public or custom domain for the bucket |
+| Variable                | Required               | Description                                                        |
+| ----------------------- | ---------------------- | ------------------------------------------------------------------ |
+| `BLOB_READ_WRITE_TOKEN` | Required in production | Vercel Blob read/write token, automatically provisioned via Storage |
 
-> Local development does not require R2 variables. Files are saved to `public/uploads/` automatically.
+> Local development does not require Blob variables. Files are saved to `public/uploads/` automatically.
 
 ## Common Scripts
 
@@ -154,8 +150,8 @@ lib/
   prisma.ts            Prisma client singleton
   auth.ts              Password hashing and verification
   admin-auth.ts        Admin session signing and verification
-  r2.ts                Cloudflare R2 client and helpers
-  file-cleanup.ts      Upload cleanup for local and R2 storage
+  blob.ts              Vercel Blob client and helpers
+  file-cleanup.ts      Upload cleanup for local and Blob storage
   site-config.ts       Global site configuration
   validation.ts        Zod validation rules
   api-utils.ts         API response helpers
@@ -169,7 +165,7 @@ public/
 
 ## Deployment
 
-The recommended stack is: Vercel + Turso + Cloudflare R2.
+The recommended stack is: Vercel + Turso + Vercel Blob.
 
 ### 1. Create a Turso Database
 
@@ -196,13 +192,11 @@ sqlite3 dev.db .dump > dump.sql
 turso db shell miku-space < dump.sql
 ```
 
-### 3. Create a Cloudflare R2 Bucket
+### 3. Enable Vercel Blob
 
-1. Sign in to the [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Open R2 Object Storage and create a bucket such as `miku-uploads`
-3. Create an API token with Object Read & Write permissions
-4. Save the endpoint, access key ID, and secret access key
-5. Optionally bind a custom domain and enable public access
+1. Go to your Vercel project Settings → Storage
+2. Click Create Database and select the Blob type
+3. Once created, `BLOB_READ_WRITE_TOKEN` is automatically injected into your environment variables
 
 ### 4. Deploy to Vercel
 
@@ -223,11 +217,6 @@ ADMIN_SECRET=your-random-secret
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=your-scrypt-hash
 SITE_URL=https://your-domain.com
-R2_ENDPOINT=https://xxx.r2.cloudflarestorage.com
-R2_ACCESS_KEY_ID=xxx
-R2_SECRET_ACCESS_KEY=xxx
-R2_BUCKET_NAME=miku-uploads
-R2_PUBLIC_URL=https://your-r2-domain.com
 ```
 
 ### 5. Push the Schema to Production
