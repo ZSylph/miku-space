@@ -24,7 +24,10 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return ApiResponse.badRequest(parsed.error.issues[0].message);
     }
-    const { title, description, icon, color, order, active } = parsed.data;
+    const { title, description, icon, color, imageUrl, active } = parsed.data;
+
+    const maxOrder = await prisma.interest.aggregate({ _max: { order: true } });
+    const nextOrder = (maxOrder._max.order ?? -1) + 1;
 
     const interest = await prisma.interest.create({
       data: {
@@ -32,7 +35,8 @@ export async function POST(request: Request) {
         description,
         icon,
         color,
-        order: order ?? 0,
+        imageUrl: imageUrl ?? null,
+        order: nextOrder,
         active: active ?? true,
       },
     });
@@ -40,6 +44,6 @@ export async function POST(request: Request) {
     return ApiResponse.created(interest);
   } catch (err) {
     console.error("[interests:POST] Failed to create interest:", err);
-    return ApiResponse.serverError("Failed to create interest");
+    return ApiResponse.serverError("创建兴趣失败");
   }
 }

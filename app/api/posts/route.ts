@@ -8,7 +8,7 @@ export async function GET() {
   if (authError) return authError;
 
   const posts = await prisma.post.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { order: "asc" },
   });
 
   return ApiResponse.ok(posts);
@@ -24,27 +24,32 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return ApiResponse.badRequest(parsed.error.issues[0].message);
     }
-    const { title, slug, content, excerpt, coverUrl, published } = parsed.data;
+    const { title, slug, content, tags, coverUrl, featured, published } = parsed.data;
 
     const existing = await prisma.post.findUnique({ where: { slug } });
     if (existing) {
-      return ApiResponse.conflict("Slug already exists");
+      return ApiResponse.conflict("Slug 已存在");
     }
+
+    const maxOrder = await prisma.post.aggregate({ _max: { order: true } });
+    const nextOrder = (maxOrder._max.order ?? -1) + 1;
 
     const post = await prisma.post.create({
       data: {
         title,
         slug,
         content,
-        excerpt,
+        tags: JSON.stringify(tags ?? []),
         coverUrl,
+        featured: featured ?? false,
         published: published ?? false,
+        order: nextOrder,
       },
     });
 
     return ApiResponse.created(post);
   } catch (err) {
     console.error("[posts:POST] Failed to create post:", err);
-    return ApiResponse.serverError("Failed to create post");
+    return ApiResponse.serverError("创建文章失败");
   }
 }

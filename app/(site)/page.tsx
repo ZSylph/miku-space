@@ -1,16 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import PetalParticles from "@/components/effects/PetalParticles";
-import FloatingOrbs from "@/components/effects/FloatingOrbs";
-import HeroSection from "@/components/blocks/HeroSection";
-import LyricBar from "@/components/blocks/LyricBar";
-import InterestCarousel from "@/components/blocks/InterestCarousel";
-import PersonalClock from "@/components/blocks/PersonalClock";
-import VerticalGallery from "@/components/blocks/VerticalGallery";
-import FeaturedWorks from "@/components/blocks/FeaturedWorks";
-import LatestContent from "@/components/blocks/LatestContent";
+import HomePageClient from "@/components/pages/HomePageClient";
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [interests, works, posts, notes, postCount, noteCount, workCount] =
+  const [interests, works, posts, notes, featuredPosts, postCount, noteCount, workCount, songs] =
     await Promise.all([
       prisma.interest.findMany({
         where: { active: true },
@@ -31,44 +25,31 @@ export default async function HomePage() {
         orderBy: { createdAt: "desc" },
         take: 3,
       }),
+      prisma.post.findMany({
+        where: { published: true, featured: true },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
       prisma.post.count({ where: { published: true } }),
       prisma.note.count({ where: { published: true } }),
       prisma.work.count({ where: { featured: true } }),
+      prisma.song.findMany({
+        where: { active: true },
+        orderBy: { order: "asc" },
+      }),
     ]);
 
-  const contentItems = [
-    ...posts.map((p) => ({ ...p, type: "post" as const })),
-    ...notes.map((n) => ({ ...n, type: "note" as const })),
-  ]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, 5);
-
   return (
-    <>
-      <PetalParticles />
-      <FloatingOrbs />
-      <div className="relative z-10">
-        <HeroSection
-          stats={{ posts: postCount, notes: noteCount, works: workCount }}
-        />
-        <LyricBar />
-
-        <div className="flex flex-col lg:flex-row gap-5 py-6">
-          <div className="flex flex-col gap-5 lg:w-[40%]">
-            <InterestCarousel interests={interests} />
-            <PersonalClock />
-            <VerticalGallery />
-          </div>
-
-          <div className="flex flex-col gap-5 lg:w-[60%]">
-            <FeaturedWorks works={works} />
-            <LatestContent items={contentItems} />
-          </div>
-        </div>
-      </div>
-    </>
+    <HomePageClient
+      interests={interests}
+      works={works}
+      posts={posts}
+      notes={notes}
+      featuredPosts={featuredPosts}
+      postCount={postCount}
+      noteCount={noteCount}
+      workCount={workCount}
+      songs={songs}
+    />
   );
 }

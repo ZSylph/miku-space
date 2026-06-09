@@ -59,7 +59,7 @@ Chinese version: [README.md](README.md)
 ### Install and Run
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ZSylph/miku-space.git
 cd zsxy
 
 npm install

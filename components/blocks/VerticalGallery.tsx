@@ -25,7 +25,7 @@ function ImageWithFallback({ src, title }: { src: string; title: string }) {
 
   if (hasError) {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-miku-primary to-miku-primary-light flex items-center justify-center">
+      <div className="absolute inset-0 bg-linear-to-br from-miku-primary to-miku-primary-light flex items-center justify-center">
         <span className="text-4xl select-none" aria-hidden="true">
           🎨
         </span>
@@ -64,18 +64,20 @@ export default function VerticalGallery({
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
       className="rounded-[24px] p-6 backdrop-blur-xl border
-        bg-[rgba(255,255,255,0.65)] border-[rgba(168,230,225,0.25)]
-        dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]"
+        bg-[rgba(255,255,255,0.9)] border-[rgba(168,230,225,0.3)]
+        shadow-[0_4px_20px_rgba(0,0,0,0.06)]
+        dark:bg-dark-border dark:border-[rgba(255,255,255,0.12)]
+        dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">喜欢的画</h3>
+        <h3 className="text-lg font-semibold">精选画集</h3>
         <button
           onClick={handleShuffle}
           disabled={paintings.length <= 1}
           className="p-2 rounded-full transition-colors duration-200
             hover:bg-[rgba(168,230,225,0.2)]
-            dark:hover:bg-[rgba(255,255,255,0.08)]
+            dark:hover:bg-dark-border
             disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="切换下一张"
         >
@@ -84,7 +86,7 @@ export default function VerticalGallery({
       </div>
 
       {/* Image area */}
-      <div className="relative h-[200px] rounded-[16px] overflow-hidden">
+      <div className="relative w-full aspect-9/16 max-h-105 rounded-[16px] overflow-hidden">
         <AnimatePresence mode="wait">
           {currentPainting && (
             <motion.div

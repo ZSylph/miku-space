@@ -29,12 +29,13 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
+     * Match all page routes except:
+     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization)
-     * - favicon.ico
-     * - public files (uploads, images)
+     * - favicon.ico, sitemap.xml, robots.txt
+     * - public files with extensions (uploads, images)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)",
   ],
 };

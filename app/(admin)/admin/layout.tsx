@@ -1,5 +1,4 @@
-import AdminNavbar from "@/components/layout/AdminNavbar";
-import { cn } from "@/lib/utils";
+import AdminSidebar from "@/components/layout/AdminSidebar";
 
 export default function AdminLayout({
   children,
@@ -7,14 +6,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        "min-h-screen",
-        "bg-[#FFF5F7] dark:bg-[#0D0D1A]"
-      )}
-    >
-      <AdminNavbar />
-      <main className="container py-8">{children}</main>
+    <div className="min-h-screen">
+      <AdminSidebar />
+      <main className="lg:pl-[248px] min-h-screen transition-all duration-300">
+        <div className="px-5 sm:px-8 py-6 lg:py-8 max-w-6xl mx-auto">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

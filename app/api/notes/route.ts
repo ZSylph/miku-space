@@ -8,7 +8,7 @@ export async function GET() {
   if (authError) return authError;
 
   const notes = await prisma.note.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { order: "asc" },
   });
 
   return ApiResponse.ok(notes);
@@ -24,27 +24,31 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return ApiResponse.badRequest(parsed.error.issues[0].message);
     }
-    const { title, slug, content, category, coverUrl, published } = parsed.data;
+    const { title, slug, content, tags, coverUrl, published } = parsed.data;
 
     const existing = await prisma.note.findUnique({ where: { slug } });
     if (existing) {
-      return ApiResponse.conflict("Slug already exists");
+      return ApiResponse.conflict("Slug 已存在");
     }
+
+    const maxOrder = await prisma.note.aggregate({ _max: { order: true } });
+    const nextOrder = (maxOrder._max.order ?? -1) + 1;
 
     const note = await prisma.note.create({
       data: {
         title,
         slug,
         content,
-        category,
+        tags: JSON.stringify(tags ?? []),
         coverUrl,
         published: published ?? false,
+        order: nextOrder,
       },
     });
 
     return ApiResponse.created(note);
   } catch (err) {
     console.error("[notes:POST] Failed to create note:", err);
-    return ApiResponse.serverError("Failed to create note");
+    return ApiResponse.serverError("创建笔记失败");
   }
 }

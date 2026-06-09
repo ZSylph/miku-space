@@ -12,13 +12,13 @@
 
 ## 文件结构映射
 
-| 文件 | 操作 | 职责 |
-|------|------|------|
+| 文件                                    | 操作 | 职责                                |
+| --------------------------------------- | ---- | ----------------------------------- |
 | `components/effects/PetalParticles.tsx` | 创建 | Canvas 花瓣飘落粒子系统（首页背景） |
-| `components/effects/FloatingOrbs.tsx` | 创建 | 浮动光斑粒子（首页背景叠加） |
-| `components/blocks/HeroSection.tsx` | 重写 | Hero 区域（个人卡片 + 音乐播放器） |
-| `components/blocks/LyricBar.tsx` | 创建 | 歌词条组件（打字机光标效果） |
-| `app/(site)/page.tsx` | 修改 | 整合新组件到首页 |
+| `components/effects/FloatingOrbs.tsx`   | 创建 | 浮动光斑粒子（首页背景叠加）        |
+| `components/blocks/HeroSection.tsx`     | 重写 | Hero 区域（个人卡片 + 音乐播放器）  |
+| `components/blocks/LyricBar.tsx`        | 创建 | 歌词条组件（打字机光标效果）        |
+| `app/(site)/page.tsx`                   | 修改 | 整合新组件到首页                    |
 
 ---
 
@@ -27,6 +27,7 @@
 以下已在里程碑 1 中完成，各任务直接复用：
 
 **颜色（Tailwind 自定义类）：**
+
 - `--color-miku-primary: #A8E6E1` — 主题色
 - `--color-miku-primary-light: #C8F0EC` — 浅色主题
 - `--color-miku-primary-dark: #7DD9D2` — 深色主题
@@ -37,6 +38,7 @@
 - `text-foreground` — 主文字色
 
 **工具类（已存在于 `globals.css`）：**
+
 - `.glass` — 深色毛玻璃
 - `.glass-light` — 浅色毛玻璃
 - `.text-gradient` — 渐变文字
@@ -53,11 +55,13 @@
 ## Task 1：Canvas 花瓣粒子系统
 
 **Files:**
+
 - Create: `components/effects/PetalParticles.tsx`
 
 **上下文：** 首页专属背景特效。使用 Canvas 2D 渲染花瓣形状粒子，从顶部飘落到底部，带左右摇摆和旋转效果。深色模式下花瓣更亮更明显，浅色模式下更 subtle。性能策略：requestAnimationFrame + delta time、document.hidden 时暂停、prefers-reduced-motion 时禁用。
 
 **设计规格：**
+
 - 花瓣双色：淡粉 `#F5C6D0`（60%）+ 淡青 `#A8E6E1`（40%）
 - 数量：桌面 30-50 片（通过屏幕宽度自适应：桌面 45，平板 30，移动端 15）
 - 形状：简化椭圆（长宽比 2:1），非 SVG path（保持性能）
@@ -134,7 +138,7 @@ export default function PetalParticles() {
 
     // Check reduced motion preference
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
@@ -154,7 +158,7 @@ export default function PetalParticles() {
     // Initialize petals
     const count = getParticleCount();
     petalsRef.current = Array.from({ length: count }, () =>
-      createPetal(window.innerWidth)
+      createPetal(window.innerWidth),
     );
     // Scatter initial positions vertically
     petalsRef.current.forEach((p) => {
@@ -185,7 +189,10 @@ export default function PetalParticles() {
         petal.y += petal.speedY * deltaTime;
         const elapsed = timestamp + petal.timeOffset;
         petal.x +=
-          Math.sin(elapsed * petal.swayFrequency) * petal.swayAmplitude * 0.02 * deltaTime +
+          Math.sin(elapsed * petal.swayFrequency) *
+            petal.swayAmplitude *
+            0.02 *
+            deltaTime +
           petal.speedX * deltaTime;
         petal.rotation += petal.rotationSpeed * deltaTime;
 
@@ -265,11 +272,13 @@ EOF
 ## Task 2：浮动光斑粒子
 
 **Files:**
+
 - Create: `components/effects/FloatingOrbs.tsx`
 
 **上下文：** 首页背景叠加特效，在花瓣之上营造朦胧梦幻感。比花瓣更 subtle，使用 blur 光点缓慢漂浮。深色模式更明显，浅色模式更朦胧。
 
 **设计规格：**
+
 - 数量：18 个（不随屏幕变化）
 - 形状：圆形，大小 2-8px
 - 颜色：白色/淡青 `#A8E6E1`，深色模式更亮
@@ -337,7 +346,7 @@ export default function FloatingOrbs() {
     if (!ctx) return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
@@ -355,7 +364,7 @@ export default function FloatingOrbs() {
     window.addEventListener("resize", resize);
 
     orbsRef.current = Array.from({ length: ORB_COUNT }, () =>
-      createOrb(window.innerWidth, window.innerHeight)
+      createOrb(window.innerWidth, window.innerHeight),
     );
 
     function animate(timestamp: number) {
@@ -458,17 +467,20 @@ EOF
 ## Task 3：Hero 区域重构（个人卡片 + 音乐播放器）
 
 **Files:**
+
 - Rewrite: `components/blocks/HeroSection.tsx`
 
 **上下文：** 当前 Hero 区域为居中单栏（头像 + 标题 + 简介 + 按钮），需要改为左右分栏布局。左栏为个人卡片，右栏为音乐播放器。整体设计保持毛玻璃卡片风格，适配深浅色双模式。
 
 **当前数据结构（来自 page.tsx）：**
+
 - 需要传入：用户统计数字（文章数、笔记数、作品数）、社交链接
 - 音乐播放器需要：歌曲列表（mock 数据即可）、播放控制
 
 **设计规格：**
 
 **左栏（约 55% 宽度）：个人卡片**
+
 - 外层：毛玻璃卡片 `.glass-light dark:glass`，圆角 24px，padding 28px
 - 头像区域：64px 圆角 16px 方块，渐变背景 `from-miku-primary to-miku-primary-light`
 - 用户名：28px font-bold tracking-tight，文字渐变 `text-gradient`
@@ -477,6 +489,7 @@ EOF
 - 社交图标行：GitHub / Twitter / Email / Discord，使用 lucide-react 图标，32px 圆角按钮，半透明底 + hover 主题色
 
 **右栏（约 45% 宽度）：音乐播放器**
+
 - 外层：毛玻璃卡片，圆角 24px，padding 24px
 - 专辑封面：52px 圆角 14px，渐变背景占位
 - 歌曲信息：歌名（16px font-semibold）+ 歌手（12px text-muted-foreground）
@@ -606,7 +619,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className={cn(
             "flex-1 lg:flex-[1.2] rounded-3xl p-7",
-            "glass-light dark:glass"
+            "glass-light dark:glass",
           )}
         >
           <div className="flex items-center gap-4 mb-5">
@@ -615,7 +628,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
             </div>
             <div>
               <h1 className="text-[28px] font-bold tracking-tight text-gradient">
-                玖驻零时
+                玖驻zsxy
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 设计师 / 开发者 / 二次元爱好者
@@ -653,7 +666,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
                 className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300",
                   "bg-[rgba(168,230,225,0.1)] border border-[rgba(168,230,225,0.15)] text-muted-foreground",
-                  "hover:bg-[rgba(168,230,225,0.2)] hover:text-miku-primary-dark hover:-translate-y-0.5"
+                  "hover:bg-[rgba(168,230,225,0.2)] hover:text-miku-primary-dark hover:-translate-y-0.5",
                 )}
               >
                 <social.icon className="h-4 w-4" strokeWidth={2} />
@@ -667,10 +680,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
-          className={cn(
-            "flex-1 rounded-3xl p-6",
-            "glass-light dark:glass"
-          )}
+          className={cn("flex-1 rounded-3xl p-6", "glass-light dark:glass")}
         >
           {/* Current Song Info */}
           <div className="flex items-center gap-3.5 mb-5">
@@ -719,14 +729,17 @@ export default function HeroSection({ stats }: HeroSectionProps) {
               className={cn(
                 "flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300",
                 "bg-gradient-to-br from-miku-primary to-miku-primary-light shadow-[0_2px_12px_rgba(168,230,225,0.3)]",
-                "hover:shadow-[0_4px_20px_rgba(168,230,225,0.4)] hover:scale-105 active:scale-95"
+                "hover:shadow-[0_4px_20px_rgba(168,230,225,0.4)] hover:scale-105 active:scale-95",
               )}
               aria-label={isPlaying ? "暂停" : "播放"}
             >
               {isPlaying ? (
                 <Pause className="h-4 w-4 text-[#0D0D1A]" strokeWidth={2.5} />
               ) : (
-                <Play className="h-4 w-4 text-[#0D0D1A] ml-0.5" strokeWidth={2.5} />
+                <Play
+                  className="h-4 w-4 text-[#0D0D1A] ml-0.5"
+                  strokeWidth={2.5}
+                />
               )}
             </button>
             <button
@@ -751,7 +764,7 @@ export default function HeroSection({ stats }: HeroSectionProps) {
                   "flex items-center justify-between w-full rounded-xl px-3 py-2 text-left transition-all duration-200",
                   index === currentSongIndex
                     ? "bg-[rgba(168,230,225,0.12)] text-miku-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-[rgba(168,230,225,0.06)]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-[rgba(168,230,225,0.06)]",
                 )}
               >
                 <span className="text-sm truncate pr-2">{song.title}</span>
@@ -778,21 +791,39 @@ import HeroSection from "@/components/blocks/HeroSection";
 // ... other imports
 
 export default async function HomePage() {
-  const [interests, works, posts, notes, postCount, noteCount, workCount] = await Promise.all([
-    prisma.interest.findMany({ where: { active: true }, orderBy: { order: "asc" } }),
-    prisma.work.findMany({ where: { featured: true }, orderBy: { order: "asc" }, take: 4 }),
-    prisma.post.findMany({ where: { published: true }, orderBy: { createdAt: "desc" }, take: 3 }),
-    prisma.note.findMany({ where: { published: true }, orderBy: { createdAt: "desc" }, take: 3 }),
-    prisma.post.count({ where: { published: true } }),
-    prisma.note.count({ where: { published: true } }),
-    prisma.work.count({ where: { featured: true } }),
-  ]);
+  const [interests, works, posts, notes, postCount, noteCount, workCount] =
+    await Promise.all([
+      prisma.interest.findMany({
+        where: { active: true },
+        orderBy: { order: "asc" },
+      }),
+      prisma.work.findMany({
+        where: { featured: true },
+        orderBy: { order: "asc" },
+        take: 4,
+      }),
+      prisma.post.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+      prisma.note.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+      prisma.post.count({ where: { published: true } }),
+      prisma.note.count({ where: { published: true } }),
+      prisma.work.count({ where: { featured: true } }),
+    ]);
 
   // ... existing contentItems logic
 
   return (
     <div className="relative">
-      <HeroSection stats={{ posts: postCount, notes: noteCount, works: workCount }} />
+      <HeroSection
+        stats={{ posts: postCount, notes: noteCount, works: workCount }}
+      />
       {/* ... other sections */}
     </div>
   );
@@ -827,11 +858,13 @@ EOF
 ## Task 4：歌词条组件
 
 **Files:**
+
 - Create: `components/blocks/LyricBar.tsx`
 
 **上下文：** 位于 Hero 区域下方，单行居中显示歌词。当前歌词白色高亮，待播放歌词灰色。带有打字机闪烁光标效果。毛玻璃背景条。
 
 **设计规格：**
+
 - 容器：圆角 pill 形状（rounded-full），max-w-2xl 居中，padding 14px 28px
 - 背景：`bg-[rgba(168,230,225,0.08)]` 浅色，`dark:bg-[rgba(255,255,255,0.05)]` 深色
 - 边框：`border-[rgba(168,230,225,0.2)]` 浅色，`dark:border-[rgba(255,255,255,0.1)]` 深色
@@ -841,10 +874,12 @@ EOF
 - 支持逐字高亮效果（当前词逐字变亮）
 
 **动画：**
+
 - 入场：Framer Motion，`opacity: 0, y: 10` → `opacity: 1, y: 0`，delay 0.3s
 - 光标闪烁：CSS animation
 
 **Mock 歌词数据：**
+
 ```ts
 const lyrics = [
   "世界で一番おひめさま",
@@ -853,6 +888,7 @@ const lyrics = [
   "その二 ちゃんと靴まで見ること いいね？",
 ];
 ```
+
 - 自动轮播，每句 4 秒，循环播放
 - 切换时淡入淡出
 
@@ -937,7 +973,7 @@ export default function LyricBar() {
           "flex items-center justify-center max-w-2xl w-full mx-auto",
           "rounded-full px-7 py-3.5",
           "bg-[rgba(168,230,225,0.08)] border border-[rgba(168,230,225,0.2)]",
-          "dark:bg-[rgba(255,255,255,0.05)] dark:border-[rgba(255,255,255,0.1)]"
+          "dark:bg-[rgba(255,255,255,0.05)] dark:border-[rgba(255,255,255,0.1)]",
         )}
       >
         <AnimatePresence mode="wait">
@@ -955,7 +991,7 @@ export default function LyricBar() {
                 <span
                   className={cn(
                     "text-miku-primary transition-opacity duration-100",
-                    showCursor ? "opacity-100" : "opacity-0"
+                    showCursor ? "opacity-100" : "opacity-0",
                   )}
                 >
                   |
@@ -965,7 +1001,7 @@ export default function LyricBar() {
                 <span
                   className={cn(
                     "text-miku-primary transition-opacity duration-300",
-                    showCursor ? "opacity-100" : "opacity-0"
+                    showCursor ? "opacity-100" : "opacity-0",
                   )}
                 >
                   |
@@ -994,7 +1030,9 @@ export default async function HomePage() {
 
   return (
     <div className="relative">
-      <HeroSection stats={{ posts: postCount, notes: noteCount, works: workCount }} />
+      <HeroSection
+        stats={{ posts: postCount, notes: noteCount, works: workCount }}
+      />
       <LyricBar />
       {/* ... existing sections */}
     </div>
@@ -1028,6 +1066,7 @@ EOF
 ## Task 5：整合粒子特效到首页
 
 **Files:**
+
 - Modify: `app/(site)/page.tsx`
 
 **上下文：** 将 PetalParticles 和 FloatingOrbs 添加到首页，确保它们只在此页面渲染。Canvas 组件使用 `position: fixed` 覆盖全屏，pointer-events: none，z-index 底层。
@@ -1081,7 +1120,7 @@ export default async function HomePage() {
   ]
     .sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
     .slice(0, 5);
 
@@ -1112,6 +1151,7 @@ Expected: 无类型错误
 
 Run: `npm run dev`
 浏览器检查清单：
+
 - [ ] 花瓣粒子从顶部飘落，有摇摆效果
 - [ ] 光斑粒子缓慢漂浮，有呼吸效果
 - [ ] 内容在粒子上方正常显示
@@ -1146,6 +1186,7 @@ Expected: 无类型错误
 
 Run: `npm run dev`
 浏览器检查清单：
+
 - [ ] 花瓣粒子：深色模式明显，浅色模式 subtle
 - [ ] 光斑粒子：朦胧 blur 效果，呼吸透明度
 - [ ] Hero 区域：左右分栏，左栏个人卡片，右栏音乐播放器
@@ -1163,6 +1204,7 @@ Run: `npm run dev`
 ```bash
 git log --oneline -6
 ```
+
 Expected: 看到 5-6 个里程碑 2 相关 commit
 
 ---
@@ -1171,15 +1213,15 @@ Expected: 看到 5-6 个里程碑 2 相关 commit
 
 ### Spec 覆盖检查
 
-| 设计文档要求 | 对应任务 |
-|-------------|---------|
-| Canvas 花瓣粒子系统 | Task 1 |
-| 浮动光斑粒子 | Task 2 |
-| Hero 左右分栏（个人卡片 + 音乐播放器）| Task 3 |
-| 歌词条（打字机光标）| Task 4 |
-| 首页整合 | Task 5 |
-| 性能策略（RAF + delta time + reduced motion）| Task 1, 2 |
-| 双模式适配 | 所有任务 |
+| 设计文档要求                                  | 对应任务  |
+| --------------------------------------------- | --------- |
+| Canvas 花瓣粒子系统                           | Task 1    |
+| 浮动光斑粒子                                  | Task 2    |
+| Hero 左右分栏（个人卡片 + 音乐播放器）        | Task 3    |
+| 歌词条（打字机光标）                          | Task 4    |
+| 首页整合                                      | Task 5    |
+| 性能策略（RAF + delta time + reduced motion） | Task 1, 2 |
+| 双模式适配                                    | 所有任务  |
 
 ### Placeholder 扫描
 

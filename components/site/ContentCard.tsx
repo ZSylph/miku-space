@@ -7,10 +7,10 @@ export interface ContentItem {
   id: string;
   title: string;
   slug: string;
-  excerpt?: string | null;
   description?: string | null;
   coverUrl?: string | null;
   category?: string | null;
+  tags?: string[];
   createdAt: Date;
 }
 
@@ -19,8 +19,7 @@ interface ContentCardProps {
   href: string;
   variant?: "grid" | "list";
   showExcerpt?: boolean;
-  showCategory?: boolean;
-  aspectVideo?: boolean;
+  showTags?: boolean;
 }
 
 function formatDate(date: Date): string {
@@ -49,10 +48,9 @@ export default function ContentCard({
   href,
   variant = "grid",
   showExcerpt = true,
-  showCategory = false,
-  aspectVideo = false,
+  showTags = false,
 }: ContentCardProps) {
-  const displayText = item.excerpt || item.description;
+  const displayText = item.description;
 
   if (variant === "list") {
     return (
@@ -62,7 +60,7 @@ export default function ContentCard({
             "flex flex-row gap-4 rounded-[20px] p-4",
             "bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-[rgba(168,230,225,0.25)]",
             "dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]",
-            "transition-all duration-300",
+            "transition-[background-color,border-color,box-shadow,transform] duration-300",
             "hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(168,230,225,0.12)]"
           )}
         >
@@ -98,16 +96,21 @@ export default function ContentCard({
               </p>
             )}
 
-            <div className="flex items-center gap-2 mt-2">
-              {showCategory && item.category && (
-                <span
-                  className={cn(
-                    "text-[11px] px-2 py-0.5 rounded-full",
-                    "bg-[rgba(245,198,208,0.15)] text-miku-pink"
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              {showTags && item.tags && item.tags.length > 0 && (
+                <div className="flex items-center gap-1 flex-wrap">
+                  {item.tags.slice(0, 4).map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(168,230,225,0.12)] text-miku-primary-dark dark:bg-[rgba(168,230,225,0.08)]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {item.tags.length > 4 && (
+                    <span className="text-[10px] text-muted-foreground/50">+{item.tags.length - 4}</span>
                   )}
-                >
-                  {item.category}
-                </span>
+                </div>
               )}
               <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Calendar className="w-3 h-3" />
@@ -128,16 +131,13 @@ export default function ContentCard({
           "rounded-[20px] overflow-hidden h-full flex flex-col",
           "bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-[rgba(168,230,225,0.25)]",
           "dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]",
-          "transition-all duration-300",
+          "transition-[background-color,border-color,box-shadow,transform] duration-300",
           "hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(168,230,225,0.12)]"
         )}
       >
         {/* Cover */}
         <div
-          className={cn(
-            "relative w-full overflow-hidden",
-            aspectVideo ? "aspect-video" : "aspect-video"
-          )}
+          className="relative w-full overflow-hidden aspect-square"
         >
           {item.coverUrl ? (
             <Image
@@ -169,16 +169,21 @@ export default function ContentCard({
             </p>
           )}
 
-          <div className="flex items-center gap-2 mt-auto pt-3">
-            {showCategory && item.category && (
-              <span
-                className={cn(
-                  "text-[11px] px-2 py-0.5 rounded-full",
-                  "bg-[rgba(245,198,208,0.15)] text-miku-pink"
+          <div className="flex items-center gap-2 mt-auto pt-3 flex-wrap">
+            {showTags && item.tags && item.tags.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap">
+                {item.tags.slice(0, 4).map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-[10px] px-1.5 py-0.5 rounded-full bg-[rgba(168,230,225,0.12)] text-miku-primary-dark dark:bg-[rgba(168,230,225,0.08)]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                {item.tags.length > 4 && (
+                  <span className="text-[10px] text-muted-foreground/50">+{item.tags.length - 4}</span>
                 )}
-              >
-                {item.category}
-              </span>
+              </div>
             )}
             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
               <Calendar className="w-3 h-3" />

@@ -14,13 +14,13 @@ export default function Error({
           "max-w-md w-full rounded-[24px] backdrop-blur-xl p-8 text-center",
           "bg-[rgba(255,255,255,0.9)] border border-[rgba(168,230,225,0.3)]",
           "shadow-[0_4px_20px_rgba(0,0,0,0.06)]",
-          "dark:bg-[rgba(255,255,255,0.08)] dark:border-[rgba(255,255,255,0.12)]",
+          "dark:bg-dark-border dark:border-[rgba(255,255,255,0.12)]",
           "dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]",
         ].join(" ")}
       >
         <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-[rgba(245,198,208,0.15)] flex items-center justify-center">
           <svg
-            className="w-7 h-7 text-[#F5C6D0]"
+            className="w-7 h-7 text-miku-pink"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
