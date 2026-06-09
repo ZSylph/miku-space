@@ -54,3 +54,6 @@ next-env.d.ts
 
 # logs
 dev-server.log
+
+# deployment helpers (contain real secrets)
+vercel-env-paste.txt
