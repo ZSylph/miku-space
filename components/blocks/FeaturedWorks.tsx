@@ -12,6 +12,7 @@ interface Work {
   slug: string;
   description: string;
   coverUrl?: string | null;
+  repoUrl?: string | null;
 }
 
 interface FeaturedWorksProps {
@@ -19,7 +20,7 @@ interface FeaturedWorksProps {
 }
 
 export default function FeaturedWorks({ works }: FeaturedWorksProps) {
-  const displayWorks = works.slice(0, 4);
+  if (works.length === 0) return null;
 
   return (
     <motion.div
@@ -29,12 +30,14 @@ export default function FeaturedWorks({ works }: FeaturedWorksProps) {
       transition={{ duration: 0.5 }}
       className={cn(
         "rounded-[24px] p-6 backdrop-blur-xl",
-        "bg-[rgba(255,255,255,0.65)] border border-[rgba(168,230,225,0.25)]",
-        "dark:bg-[rgba(255,255,255,0.04)] dark:border-[rgba(255,255,255,0.08)]"
+        "bg-[rgba(255,255,255,0.9)] border border-[rgba(168,230,225,0.3)]",
+        "shadow-[0_4px_20px_rgba(0,0,0,0.06)]",
+        "dark:bg-dark-border dark:border-[rgba(255,255,255,0.12)]",
+        "dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]",
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-bold text-foreground">精选作品</h2>
         <Link
           href="/works"
@@ -45,51 +48,50 @@ export default function FeaturedWorks({ works }: FeaturedWorksProps) {
         </Link>
       </div>
 
-      {/* List */}
+      {/* List — no placeholders, shrinks to content */}
       <div className="flex flex-col">
-        {displayWorks.map((work, index) => (
+        {works.slice(0, 4).map((work, index) => (
           <motion.div
             key={work.id}
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
+            transition={{ delay: index * 0.08, duration: 0.4 }}
           >
-            <Link
-              href={`/works/${work.slug}`}
+            <a
+              href={work.repoUrl || "#"}
+              target={work.repoUrl ? "_blank" : undefined}
+              rel={work.repoUrl ? "noopener noreferrer" : undefined}
               className={cn(
-                "flex items-center gap-4 py-4 group",
-                index !== displayWorks.length - 1 &&
-                  "border-b border-[rgba(168,230,225,0.1)]"
+                "flex items-center gap-4 py-2.5 group",
+                index < Math.min(works.length, 4) - 1 &&
+                  "border-b border-[rgba(168,230,225,0.1)]",
               )}
             >
-              {/* Thumbnail */}
-              <div className="w-[60px] h-[60px] rounded-xl overflow-hidden shrink-0">
+              <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0">
                 {work.coverUrl ? (
                   <Image
                     src={work.coverUrl}
                     alt={work.title}
-                    width={60}
-                    height={60}
+                    width={44}
+                    height={44}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-miku-primary to-miku-primary-light flex items-center justify-center text-lg">
+                  <div className="w-full h-full bg-linear-to-br from-miku-primary to-miku-primary-light flex items-center justify-center text-base">
                     🚀
                   </div>
                 )}
               </div>
-
-              {/* Info */}
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-foreground truncate group-hover:text-miku-primary transition-colors">
+                <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-miku-primary transition-colors">
                   {work.title}
                 </h3>
-                <p className="text-sm text-muted-foreground truncate mt-0.5">
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
                   {work.description}
                 </p>
               </div>
-            </Link>
+            </a>
           </motion.div>
         ))}
       </div>

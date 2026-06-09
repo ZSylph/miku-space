@@ -59,7 +59,7 @@ English documentation: [README.en.md](README.en.md)
 ### 安装与启动
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ZSylph/miku-space.git
 cd zsxy
 
 npm install

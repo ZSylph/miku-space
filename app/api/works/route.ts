@@ -24,30 +24,32 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return ApiResponse.badRequest(parsed.error.issues[0].message);
     }
-    const { title, slug, description, content, coverUrl, demoUrl, repoUrl, featured, order } = parsed.data;
+    const { title, slug, description, coverUrl, repoUrl, techStack, featured } = parsed.data;
 
     const existing = await prisma.work.findUnique({ where: { slug } });
     if (existing) {
-      return ApiResponse.conflict("Slug already exists");
+      return ApiResponse.conflict("Slug 已存在");
     }
+
+    const maxOrder = await prisma.work.aggregate({ _max: { order: true } });
+    const nextOrder = (maxOrder._max.order ?? -1) + 1;
 
     const work = await prisma.work.create({
       data: {
         title,
         slug,
         description,
-        content,
         coverUrl,
-        demoUrl,
         repoUrl,
+        techStack: JSON.stringify(techStack ?? []),
         featured: featured ?? false,
-        order: order ?? 0,
+        order: nextOrder,
       },
     });
 
     return ApiResponse.created(work);
   } catch (err) {
     console.error("[works:POST] Failed to create work:", err);
-    return ApiResponse.serverError("Failed to create work");
+    return ApiResponse.serverError("创建作品失败");
   }
 }

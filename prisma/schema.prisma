@@ -11,12 +11,13 @@ model Post {
   title     String
   slug      String   @unique
   content   String
-  excerpt   String?
   coverUrl  String?
+  featured  Boolean  @default(false)
   published Boolean  @default(false)
+  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  tags      Tag[]
+  tags      String   @default("[]")
 }
 
 model Note {
@@ -24,12 +25,12 @@ model Note {
   title     String
   slug      String   @unique
   content   String
-  category  String?
+  tags      String   @default("[]")
   coverUrl  String?
   published Boolean  @default(false)
+  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  tags      Tag[]
 }
 
 model Work {
@@ -37,10 +38,9 @@ model Work {
   title       String
   slug        String   @unique
   description String
-  content     String?
   coverUrl    String?
-  demoUrl     String?
   repoUrl     String?
+  techStack   String   @default("[]")
   featured    Boolean  @default(false)
   order       Int      @default(0)
   createdAt   DateTime @default(now())
@@ -51,16 +51,29 @@ model Interest {
   id          String  @id @default(cuid())
   title       String
   description String
-  icon        String
-  color       String
+  icon        String  @default("")
+  color       String  @default("blue")
+  imageUrl    String?
   order       Int     @default(0)
   active      Boolean @default(true)
+}
+
+model Song {
+  id        String   @id @default(cuid())
+  title     String
+  artist    String
+  audioUrl  String
+  coverUrl  String?
+  duration  Int      @default(0)
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  lyrics    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Tag {
   id    String @id @default(cuid())
   name  String @unique
   slug  String @unique
-  posts Post[]
-  notes Note[]
 }

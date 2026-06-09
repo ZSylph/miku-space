@@ -49,6 +49,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -146,51 +147,32 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground transition-colors duration-300;
-  }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-background text-foreground;
+    cursor: default;
+  }
+  button,
+  [role="button"],
+  a {
+    cursor: pointer;
   }
 }
 
 @layer utilities {
-  .glass {
-    @apply bg-[rgba(255,255,255,0.04)] backdrop-blur-xl border border-[rgba(255,255,255,0.08)];
-  }
-
-  .glass-light {
-    @apply bg-[rgba(255,255,255,0.65)] backdrop-blur-xl border border-[rgba(168,230,225,0.25)];
-  }
-
-  .glass-hover {
-    @apply bg-[rgba(255,255,255,0.04)] backdrop-blur-xl border border-[rgba(255,255,255,0.08)] transition-all duration-300;
-  }
-
-  .glass-hover:hover {
-    @apply bg-[rgba(255,255,255,0.06)] -translate-y-0.5;
-    box-shadow: 0 8px 32px rgba(168, 230, 225, 0.12);
-  }
-
-  .glass-light-hover {
-    @apply transition-all duration-300;
-  }
-
-  .glass-light-hover:hover {
-    @apply bg-[rgba(255,255,255,0.85)] -translate-y-0.5;
-    box-shadow: 0 8px 32px rgba(168, 230, 225, 0.15);
-  }
-
   .text-gradient {
     @apply bg-gradient-to-r from-miku-primary to-miku-primary-light bg-clip-text text-transparent;
   }
 
-  .bg-gradient-miku {
-    @apply bg-gradient-to-br from-miku-primary to-miku-primary-light;
-  }
-
   .prose-custom {
     @apply text-foreground;
+    cursor: text;
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   .prose-custom :where(h1, h2, h3, h4, h5, h6) {
@@ -276,5 +258,13 @@
 
   .prose-custom strong {
     @apply text-foreground font-semibold;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
