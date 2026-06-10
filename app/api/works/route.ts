@@ -1,55 +1,12 @@
-import { prisma } from "@/lib/prisma";
-import { requireAdminAuth } from "@/lib/admin-auth";
+import { createListHandler, createCreateHandler } from "@/lib/api-factory";
 import { workCreateSchema } from "@/lib/validation";
-import { ApiResponse } from "@/lib/api-utils";
 
-export async function GET() {
-  const authError = await requireAdminAuth();
-  if (authError) return authError;
-
-  const works = await prisma.work.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  return ApiResponse.ok(works);
-}
-
-export async function POST(request: Request) {
-  const authError = await requireAdminAuth();
-  if (authError) return authError;
-
-  try {
-    const body = await request.json();
-    const parsed = workCreateSchema.safeParse(body);
-    if (!parsed.success) {
-      return ApiResponse.badRequest(parsed.error.issues[0].message);
-    }
-    const { title, slug, description, coverUrl, repoUrl, techStack, featured } = parsed.data;
-
-    const existing = await prisma.work.findUnique({ where: { slug } });
-    if (existing) {
-      return ApiResponse.conflict("Slug 已存在");
-    }
-
-    const maxOrder = await prisma.work.aggregate({ _max: { order: true } });
-    const nextOrder = (maxOrder._max.order ?? -1) + 1;
-
-    const work = await prisma.work.create({
-      data: {
-        title,
-        slug,
-        description,
-        coverUrl,
-        repoUrl,
-        techStack: JSON.stringify(techStack ?? []),
-        featured: featured ?? false,
-        order: nextOrder,
-      },
-    });
-
-    return ApiResponse.created(work);
-  } catch (err) {
-    console.error("[works:POST] Failed to create work:", err);
-    return ApiResponse.serverError("创建作品失败");
-  }
-}
+export const GET = createListHandler("work");
+export const POST = createCreateHandler("work", workCreateSchema, {
+  hasSlug: true,
+  transformCreate: (data) => ({
+    ...data,
+    techStack: JSON.stringify(data.techStack ?? []),
+    featured: data.featured ?? false,
+  }),
+});

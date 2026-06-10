@@ -1,31 +1,3 @@
-import { prisma } from "@/lib/prisma";
-import { requireAdminAuth } from "@/lib/admin-auth";
-import { ApiResponse } from "@/lib/api-utils";
-import { reorderSchema } from "@/lib/validation";
+import { createReorderHandler } from "@/lib/api-factory";
 
-export async function PUT(request: Request) {
-  const authError = await requireAdminAuth();
-  if (authError) return authError;
-
-  try {
-    const body = await request.json();
-    const parsed = reorderSchema.safeParse(body);
-    if (!parsed.success) {
-      return ApiResponse.badRequest("Invalid reorder data");
-    }
-
-    await prisma.$transaction(
-      parsed.data.orders.map((item) =>
-        prisma.note.update({
-          where: { id: item.id },
-          data: { order: item.order },
-        })
-      )
-    );
-
-    return ApiResponse.ok({ success: true });
-  } catch (err) {
-    console.error("[notes/reorder] Failed:", err);
-    return ApiResponse.serverError("排序更新失败");
-  }
-}
+export const PUT = createReorderHandler("note");

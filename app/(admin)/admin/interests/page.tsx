@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { colorMap } from "@/lib/colorMap";
-import { cn } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import AdminListHeader from "@/components/admin/AdminListHeader";
+import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import DeleteButton from "@/components/admin/DeleteButton";
 import DragSortList from "@/components/admin/DragSortList";
 import {
   Heart,
-  Plus,
   ArrowUpRight,
   CheckCircle2,
   XCircle,
@@ -22,46 +21,22 @@ export default async function InterestsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className={cn(adminCardBase, "p-5")}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 dark:bg-rose-500/15 flex items-center justify-center">
-              <Heart className="w-5 h-5 text-rose-500" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">兴趣管理</h1>
-              <p className="text-xs text-muted-foreground">
-                共 {interests.length} 项 · {activeCount} 项启用 · 拖拽排序
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/admin/interests/new"
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium",
-              "bg-miku-primary text-primary-foreground",
-              "hover:bg-miku-primary-dark transition-colors"
-            )}
-          >
-            <Plus className="w-4 h-4" />
-            新建兴趣
-          </Link>
-        </div>
-      </div>
+      <AdminListHeader
+        icon={<Heart className="w-5 h-5 text-rose-500" />}
+        iconClassName="bg-rose-500/10 dark:bg-rose-500/15"
+        title="兴趣管理"
+        subtitle={`共 ${interests.length} 项 · ${activeCount} 项启用 · 拖拽排序`}
+        actionHref="/admin/interests/new"
+        actionLabel="新建兴趣"
+      />
 
-      {/* Content */}
       {interests.length === 0 ? (
-        <div className={cn(adminCardBase, "p-12 text-center")}>
-          <Heart className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">还没有兴趣标签，点击上方按钮创建</p>
-          <Link
-            href="/admin/interests/new"
-            className="text-sm text-miku-primary-dark hover:underline"
-          >
-            创建兴趣
-          </Link>
-        </div>
+        <AdminEmptyState
+          icon={<Heart className="w-10 h-10" />}
+          message="还没有兴趣标签，点击上方按钮创建"
+          actionHref="/admin/interests/new"
+          actionLabel="创建兴趣"
+        />
       ) : (
         <DragSortList
           items={interests.map((i) => ({ id: i.id, order: i.order }))}

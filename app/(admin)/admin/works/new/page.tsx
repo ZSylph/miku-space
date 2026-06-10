@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import AdminFormLayout from "@/components/admin/AdminFormLayout";
 import ImageUpload from "@/components/admin/ImageUpload";
+import { useAdminSubmit } from "@/components/admin/useAdminSubmit";
 import {
   adminInputClass,
   adminLabelClass,
@@ -11,27 +12,18 @@ import {
   adminSecondaryButton,
   adminCheckboxClass,
 } from "@/lib/admin-styles";
-
-function makeSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+import { makeSlug } from "@/lib/utils";
 
 export default function NewWorkPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { loading, error, setError, submit } = useAdminSubmit({
+    apiPath: "/api/works",
+    redirectPath: "/admin/works",
+  });
   const slugRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
     const formData = new FormData(e.currentTarget);
     const techStackRaw = (formData.get("techStack") as string) || "";
@@ -40,7 +32,7 @@ export default function NewWorkPage() {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const data = {
+    await submit({
       title: formData.get("title") as string,
       slug: formData.get("slug") as string,
       description: formData.get("description") as string,
@@ -48,23 +40,7 @@ export default function NewWorkPage() {
       repoUrl: formData.get("repoUrl") as string,
       techStack,
       featured: formData.get("featured") === "on",
-    };
-
-    const res = await fetch("/api/works", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
     });
-
-    setLoading(false);
-
-    if (res.ok) {
-      router.push("/admin/works");
-      router.refresh();
-    } else {
-      const result = await res.json().catch(() => ({}));
-      setError(result.error || "创建失败");
-    }
   }
 
   return (

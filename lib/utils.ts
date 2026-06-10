@@ -78,6 +78,17 @@ export function parseTags(raw: string): string[] {
   try { return JSON.parse(raw) as string[]; } catch { return []; }
 }
 
+/** Generate URL-safe slug from title text */
+export function makeSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 /** Estimate reading time in minutes for mixed Chinese/English content.
  *  ~400 chars/min for Chinese, ~200 words/min for English. */
 export function readingTime(wordCount: number): number {
