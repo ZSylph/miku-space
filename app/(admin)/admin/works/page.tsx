@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { cn } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import AdminListHeader from "@/components/admin/AdminListHeader";
+import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import DeleteButton from "@/components/admin/DeleteButton";
 import DragSortList from "@/components/admin/DragSortList";
 import {
   Briefcase,
-  Plus,
   ArrowUpRight,
   Star,
 } from "lucide-react";
@@ -20,46 +19,22 @@ export default async function WorksPage() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className={cn(adminCardBase, "p-5")}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-violet-500/10 dark:bg-violet-500/15 flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-violet-500" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">作品管理</h1>
-              <p className="text-xs text-muted-foreground">
-                共 {works.length} 个作品 · {featuredCount} 个精选 · 拖拽排序
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/admin/works/new"
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium",
-              "bg-miku-primary text-primary-foreground",
-              "hover:bg-miku-primary-dark transition-colors"
-            )}
-          >
-            <Plus className="w-4 h-4" />
-            新建作品
-          </Link>
-        </div>
-      </div>
+      <AdminListHeader
+        icon={<Briefcase className="w-5 h-5 text-violet-500" />}
+        iconClassName="bg-violet-500/10 dark:bg-violet-500/15"
+        title="作品管理"
+        subtitle={`共 ${works.length} 个作品 · ${featuredCount} 个精选 · 拖拽排序`}
+        actionHref="/admin/works/new"
+        actionLabel="新建作品"
+      />
 
-      {/* Content */}
       {works.length === 0 ? (
-        <div className={cn(adminCardBase, "p-12 text-center")}>
-          <Briefcase className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">还没有作品，点击上方按钮创建</p>
-          <Link
-            href="/admin/works/new"
-            className="text-sm text-miku-primary-dark hover:underline"
-          >
-            创建作品
-          </Link>
-        </div>
+        <AdminEmptyState
+          icon={<Briefcase className="w-10 h-10" />}
+          message="还没有作品，点击上方按钮创建"
+          actionHref="/admin/works/new"
+          actionLabel="创建作品"
+        />
       ) : (
         <DragSortList
           items={works.map((w) => ({ id: w.id, order: w.order }))}

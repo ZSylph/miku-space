@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import AdminFormLayout from "@/components/admin/AdminFormLayout";
 import ImageUpload from "@/components/admin/ImageUpload";
+import { useAdminSubmit } from "@/components/admin/useAdminSubmit";
 import {
   adminInputClass,
   adminLabelClass,
@@ -13,28 +14,19 @@ import {
   adminSecondaryButton,
   adminCheckboxClass,
 } from "@/lib/admin-styles";
-
-function makeSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+import { makeSlug } from "@/lib/utils";
 
 export default function NewPostPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { loading, error, setError, submit } = useAdminSubmit({
+    apiPath: "/api/posts",
+    redirectPath: "/admin/posts",
+  });
   const [content, setContent] = useState("");
   const slugRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
     const formData = new FormData(e.currentTarget);
     const tagsRaw = (formData.get("tags") as string) || "";
@@ -43,7 +35,7 @@ export default function NewPostPage() {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const data = {
+    await submit({
       title: formData.get("title") as string,
       slug: formData.get("slug") as string,
       content: formData.get("content") as string,
@@ -51,23 +43,7 @@ export default function NewPostPage() {
       coverUrl: formData.get("coverUrl") as string,
       published: formData.get("published") === "on",
       featured: formData.get("featured") === "on",
-    };
-
-    const res = await fetch("/api/posts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
     });
-
-    setLoading(false);
-
-    if (res.ok) {
-      router.push("/admin/posts");
-      router.refresh();
-    } else {
-      const result = await res.json().catch(() => ({}));
-      setError(result.error || "创建失败");
-    }
   }
 
   return (

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { cn, parseTags } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import { parseTags } from "@/lib/utils";
+import AdminListHeader from "@/components/admin/AdminListHeader";
+import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import DeleteButton from "@/components/admin/DeleteButton";
 import DragSortList from "@/components/admin/DragSortList";
 import {
   StickyNote,
-  Plus,
   ArrowUpRight,
   Eye,
   EyeOff,
@@ -19,53 +19,27 @@ export default async function NotesPage() {
 
   const publishedCount = notes.filter((n) => n.published).length;
   const draftCount = notes.length - publishedCount;
-
   const allTags = notes.flatMap((n) => parseTags(n.tags));
   const uniqueTags = [...new Set(allTags)];
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className={cn(adminCardBase, "p-5")}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 flex items-center justify-center">
-              <StickyNote className="w-5 h-5 text-emerald-500" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">笔记管理</h1>
-              <p className="text-xs text-muted-foreground">
-                共 {notes.length} 篇 · {publishedCount} 已发布 · {draftCount} 草稿
-                {uniqueTags.length > 0 && ` · ${uniqueTags.length} 个标签`} · 拖拽排序
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/admin/notes/new"
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium",
-              "bg-miku-primary text-primary-foreground",
-              "hover:bg-miku-primary-dark transition-colors"
-            )}
-          >
-            <Plus className="w-4 h-4" />
-            新建笔记
-          </Link>
-        </div>
-      </div>
+      <AdminListHeader
+        icon={<StickyNote className="w-5 h-5 text-emerald-500" />}
+        iconClassName="bg-emerald-500/10 dark:bg-emerald-500/15"
+        title="笔记管理"
+        subtitle={`共 ${notes.length} 篇 · ${publishedCount} 已发布 · ${draftCount} 草稿${uniqueTags.length > 0 ? ` · ${uniqueTags.length} 个标签` : ""} · 拖拽排序`}
+        actionHref="/admin/notes/new"
+        actionLabel="新建笔记"
+      />
 
-      {/* Content */}
       {notes.length === 0 ? (
-        <div className={cn(adminCardBase, "p-12 text-center")}>
-          <StickyNote className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">还没有笔记，点击上方按钮创建</p>
-          <Link
-            href="/admin/notes/new"
-            className="text-sm text-miku-primary-dark hover:underline"
-          >
-            创建笔记
-          </Link>
-        </div>
+        <AdminEmptyState
+          icon={<StickyNote className="w-10 h-10" />}
+          message="还没有笔记，点击上方按钮创建"
+          actionHref="/admin/notes/new"
+          actionLabel="创建笔记"
+        />
       ) : (
         <DragSortList
           items={notes.map((n) => ({ id: n.id, order: n.order }))}

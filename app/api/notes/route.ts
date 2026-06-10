@@ -1,54 +1,12 @@
-import { prisma } from "@/lib/prisma";
-import { requireAdminAuth } from "@/lib/admin-auth";
+import { createListHandler, createCreateHandler } from "@/lib/api-factory";
 import { noteCreateSchema } from "@/lib/validation";
-import { ApiResponse } from "@/lib/api-utils";
 
-export async function GET() {
-  const authError = await requireAdminAuth();
-  if (authError) return authError;
-
-  const notes = await prisma.note.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  return ApiResponse.ok(notes);
-}
-
-export async function POST(request: Request) {
-  const authError = await requireAdminAuth();
-  if (authError) return authError;
-
-  try {
-    const body = await request.json();
-    const parsed = noteCreateSchema.safeParse(body);
-    if (!parsed.success) {
-      return ApiResponse.badRequest(parsed.error.issues[0].message);
-    }
-    const { title, slug, content, tags, coverUrl, published } = parsed.data;
-
-    const existing = await prisma.note.findUnique({ where: { slug } });
-    if (existing) {
-      return ApiResponse.conflict("Slug 已存在");
-    }
-
-    const maxOrder = await prisma.note.aggregate({ _max: { order: true } });
-    const nextOrder = (maxOrder._max.order ?? -1) + 1;
-
-    const note = await prisma.note.create({
-      data: {
-        title,
-        slug,
-        content,
-        tags: JSON.stringify(tags ?? []),
-        coverUrl,
-        published: published ?? false,
-        order: nextOrder,
-      },
-    });
-
-    return ApiResponse.created(note);
-  } catch (err) {
-    console.error("[notes:POST] Failed to create note:", err);
-    return ApiResponse.serverError("创建笔记失败");
-  }
-}
+export const GET = createListHandler("note");
+export const POST = createCreateHandler("note", noteCreateSchema, {
+  hasSlug: true,
+  transformCreate: (data) => ({
+    ...data,
+    tags: JSON.stringify(data.tags ?? []),
+    published: data.published ?? false,
+  }),
+});

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { cn, parseTags } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import { parseTags } from "@/lib/utils";
+import AdminListHeader from "@/components/admin/AdminListHeader";
+import AdminEmptyState from "@/components/admin/AdminEmptyState";
 import DeleteButton from "@/components/admin/DeleteButton";
 import DragSortList from "@/components/admin/DragSortList";
 import {
   FileText,
-  Plus,
   ArrowUpRight,
   Eye,
   EyeOff,
@@ -20,53 +20,27 @@ export default async function PostsPage() {
 
   const publishedCount = posts.filter((p) => p.published).length;
   const draftCount = posts.length - publishedCount;
-
   const allTags = posts.flatMap((p) => parseTags(p.tags));
   const uniqueTags = [...new Set(allTags)];
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className={cn(adminCardBase, "p-5")}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/15 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-500" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">文章管理</h1>
-              <p className="text-xs text-muted-foreground">
-                共 {posts.length} 篇 · {publishedCount} 已发布 · {draftCount} 草稿
-                {uniqueTags.length > 0 && ` · ${uniqueTags.length} 个标签`} · 拖拽排序
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/admin/posts/new"
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium",
-              "bg-miku-primary text-primary-foreground",
-              "hover:bg-miku-primary-dark transition-colors"
-            )}
-          >
-            <Plus className="w-4 h-4" />
-            新建文章
-          </Link>
-        </div>
-      </div>
+      <AdminListHeader
+        icon={<FileText className="w-5 h-5 text-blue-500" />}
+        iconClassName="bg-blue-500/10 dark:bg-blue-500/15"
+        title="文章管理"
+        subtitle={`共 ${posts.length} 篇 · ${publishedCount} 已发布 · ${draftCount} 草稿${uniqueTags.length > 0 ? ` · ${uniqueTags.length} 个标签` : ""} · 拖拽排序`}
+        actionHref="/admin/posts/new"
+        actionLabel="新建文章"
+      />
 
-      {/* Content */}
       {posts.length === 0 ? (
-        <div className={cn(adminCardBase, "p-12 text-center")}>
-          <FileText className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">还没有文章，点击上方按钮创建第一篇</p>
-          <Link
-            href="/admin/posts/new"
-            className="text-sm text-miku-primary-dark hover:underline"
-          >
-            创建文章
-          </Link>
-        </div>
+        <AdminEmptyState
+          icon={<FileText className="w-10 h-10" />}
+          message="还没有文章，点击上方按钮创建第一篇"
+          actionHref="/admin/posts/new"
+          actionLabel="创建文章"
+        />
       ) : (
         <DragSortList
           items={posts.map((p) => ({ id: p.id, order: p.order }))}

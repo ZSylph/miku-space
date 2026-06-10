@@ -13,7 +13,7 @@ export const siteConfig = {
   social: {
     github: "https://github.com/ZSylph",
     bilibili: "https://space.bilibili.com/277755137",
-    email: "1004076966@qq.com",
+    email: process.env.AUTHOR_EMAIL || "",
   },
 
   /** 萌 ICP 备案号 */
