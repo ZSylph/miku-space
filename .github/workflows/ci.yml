@@ -25,7 +25,11 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Run Prisma Migrations (创建数据库表)
+        run: npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -34,7 +38,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
         env:
           ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
           ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
