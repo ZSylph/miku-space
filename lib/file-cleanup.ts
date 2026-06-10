@@ -1,7 +1,8 @@
 import { unlink, readdir, stat } from "fs/promises";
 import { join } from "path";
-import { prisma } from "@/lib/prisma";
-import { isBlobEnabled, listBlobUploads, deleteFromBlob } from "@/lib/blob";
+import { getPrisma } from "@/lib/prisma";
+import { getCloudflareEnv } from "@/lib/prisma";
+import { isR2Enabled, listR2Uploads, deleteFromR2 } from "@/lib/r2";
 
 const UPLOADS_DIR = join(process.cwd(), "public", "uploads");
 
@@ -9,15 +10,15 @@ const UPLOADS_DIR = join(process.cwd(), "public", "uploads");
  *  Helpers
  * ────────────────────────────────────────────── */
 
-/** Check if a URL is a Vercel Blob URL. */
-function isBlobUrl(url: string): boolean {
-  return url.includes(".blob.vercel-storage.com/");
+/** Check if a URL is a Cloudflare R2 URL. */
+function isR2Url(url: string): boolean {
+  return url.includes(".r2.cloudflarestorage.com/");
 }
 
-/** Check if a URL is a managed upload (local /uploads/ or Vercel Blob). */
+/** Check if a URL is a managed upload (local /uploads/ or Cloudflare R2). */
 function isManagedUrl(url: string): boolean {
   if (url.startsWith("/uploads/")) return true;
-  if (isBlobUrl(url)) return true;
+  if (isR2Url(url)) return true;
   return false;
 }
 
@@ -30,8 +31,11 @@ export async function deleteUploadFile(
 ): Promise<void> {
   if (!url || !isManagedUrl(url)) return;
 
-  if (isBlobEnabled() && isBlobUrl(url)) {
-    await deleteFromBlob(url);
+  if (isR2Enabled() && isR2Url(url)) {
+    const env = getCloudflareEnv()!;
+    const publicUrl = (env.R2_PUBLIC_URL as string) || "";
+    const key = url.replace(publicUrl.replace(/\/$/, "") + "/", "");
+    await deleteFromR2(key);
     return;
   }
 
@@ -53,6 +57,7 @@ export async function deleteUploadFile(
  * ────────────────────────────────────────────── */
 
 export async function collectAllUsedUrls(): Promise<Set<string>> {
+  const prisma = getPrisma();
   const used = new Set<string>();
 
   const [songs, posts, notes, works, interests] = await Promise.all([
@@ -86,17 +91,17 @@ export async function cleanupOrphanUploads(
   const used = await collectAllUsedUrls();
   const deleted: string[] = [];
 
-  if (isBlobEnabled()) {
-    const blobs = await listBlobUploads();
+  if (isR2Enabled()) {
+    const objects = await listR2Uploads();
 
-    for (const blob of blobs) {
-      if (used.has(blob.url)) continue;
+    for (const obj of objects) {
+      if (used.has(obj.url)) continue;
 
       // Grace period
-      if (blob.uploadedAt && Date.now() - blob.uploadedAt.getTime() < gracePeriodMs) continue;
+      if (obj.lastModified && Date.now() - obj.lastModified.getTime() < gracePeriodMs) continue;
 
-      await deleteFromBlob(blob.url);
-      deleted.push(blob.pathname);
+      await deleteFromR2(obj.key);
+      deleted.push(obj.key);
     }
     return { deleted };
   }

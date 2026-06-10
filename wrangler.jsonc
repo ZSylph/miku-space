@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "miku-space",
+  "compatibilityDate": "2025-06-01",
+  "compatibilityFlags": ["nodejs_compat"],
+  "main": ".open-next/worker.js",
+
+  // ── 环境变量（非敏感配置）──
+  "vars": {
+    "SITE_URL": "https://your-domain.pages.dev",
+    "ADMIN_USERNAME": "admin"
+  },
+
+  // ── Secrets（通过 wrangler secret put 设置）──
+  // ADMIN_SECRET, ADMIN_PASSWORD_HASH
+  // R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
+
+  // ── D1 数据库 ──
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "miku-space",
+      "database_id": "<your-d1-database-id>"
+    }
+  ],
+
+  // ── R2 存储桶 ──
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "miku-uploads"
+    }
+  ]
+}
