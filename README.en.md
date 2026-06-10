@@ -2,14 +2,15 @@
 
 Miku Space is a personal blog and portfolio built with the Next.js App Router. It combines content publishing, admin management, full-text search, SEO, social sharing, and theme switching in one place. The site uses a clean teal visual language and organizes information around posts, notes, works, interests, and music for both presentation and day-to-day maintenance.
 
-Chinese version: [README.md](README.md)
+README：
+**[简体中文](README.md)** | **[English](README.en.md)**
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19.2.6-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-7.8.0-2D3748?logo=prisma)
-![SQLite](https://img.shields.io/badge/SQLite_/_libSQL-3-003B57?logo=sqlite)
+![SQLite](https://img.shields.io/badge/SQLite_/_D1-3-003B57?logo=sqlite)
 
 ## Highlights
 
@@ -28,15 +29,15 @@ Chinese version: [README.md](README.md)
 
 - The admin area supports creating, editing, reordering, and deleting posts, notes, works, interests, and songs.
 - Draft and published states make staged publishing easier.
-- Image and audio uploads use local storage in development and switch to Vercel Blob in production.
+- Image and audio uploads use local storage in development and switch to Cloudflare R2 in production.
 - Drag sorting and featured flags help maintain the homepage and curated sections.
 - Admin login uses a cookie-based auth flow protected with an HMAC signature.
 
 ### Engineering
 
-- Prisma with the libSQL adapter powers the database layer, using local SQLite in development and Turso in production.
-- Next.js standalone output keeps deployment flexible for Vercel or a Node.js server.
-- File storage supports both local disk and Vercel Blob through environment-driven switching.
+- Prisma powers the database layer, using local SQLite in development and Cloudflare D1 via the D1 adapter in production.
+- The @opennextjs/cloudflare adapter enables deployment to Cloudflare Workers at the edge.
+- File storage supports both local disk and Cloudflare R2 through environment-driven switching.
 - ESLint, TypeScript, and Tailwind CSS 4 provide the project tooling stack.
 
 ## Tech Stack
@@ -44,9 +45,9 @@ Chinese version: [README.md](README.md)
 - Framework: Next.js 16.2.6 with App Router and Turbopack
 - UI: React 19, Tailwind CSS 4, Framer Motion, Lucide React
 - Content: React Markdown with remark-gfm
-- Database: SQLite in development, Turso libSQL in production
-- ORM: Prisma 7.8.0 with @prisma/adapter-libsql
-- Storage: Local disk in development, Vercel Blob in production
+- Database: SQLite in development, Cloudflare D1 in production
+- ORM: Prisma 7.8.0 with @prisma/adapter-d1
+- Storage: Local disk in development, Cloudflare R2 in production
 - Types: TypeScript 5 and Zod validation
 
 ## Quick Start
@@ -82,12 +83,11 @@ After startup:
 
 Create a `.env` file in the project root and configure the following groups.
 
-### Database
+### Database (local development only)
 
-| Variable              | Required               | Description                                                                                         |
-| --------------------- | ---------------------- | --------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`        | Yes                    | Development: `file:./dev.db`; production: a Turso connection string such as `libsql://xxx.turso.io` |
-| `DATABASE_AUTH_TOKEN` | Required in production | Turso auth token created with `turso db tokens create <name>`                                       |
+| Variable       | Required | Description                                                                          |
+| -------------- | -------- | ------------------------------------------------------------------------------------ |
+| `DATABASE_URL` | Yes      | Development: `file:./dev.db`. Production uses a D1 binding and does not need this.  |
 
 ### Site
 
@@ -103,25 +103,30 @@ Create a `.env` file in the project root and configure the following groups.
 | `ADMIN_PASSWORD_HASH` | Yes      | Password scrypt hash                                       |
 | `ADMIN_SECRET`        | Yes      | HMAC signing key for session cookies, ideally 64 hex chars |
 
-### Vercel Blob
+### Cloudflare R2
 
-| Variable                | Required               | Description                                                        |
-| ----------------------- | ---------------------- | ------------------------------------------------------------------ |
-| `BLOB_READ_WRITE_TOKEN` | Required in production | Vercel Blob read/write token, automatically provisioned via Storage |
+| Variable               | Required               | Description                                |
+| ---------------------- | ---------------------- | ------------------------------------------ |
+| `R2_ENDPOINT`          | Required in production | R2 S3-compatible API endpoint              |
+| `R2_ACCESS_KEY_ID`     | Required in production | R2 API Access Key ID                       |
+| `R2_SECRET_ACCESS_KEY` | Required in production | R2 API Secret Access Key                   |
+| `R2_BUCKET_NAME`       | No                     | Bucket name, defaults to `miku-uploads`    |
+| `R2_PUBLIC_URL`        | Required in production | Public access URL for the R2 bucket        |
 
-> Local development does not require Blob variables. Files are saved to `public/uploads/` automatically.
+> Production credentials are configured via `wrangler.jsonc` bindings and `wrangler secret put`. Local development saves files to `public/uploads/` automatically.
 
 ## Common Scripts
 
-| Command                  | Description                                        |
-| ------------------------ | -------------------------------------------------- |
-| `npm run dev`            | Start the development server                       |
-| `npm run build`          | Build the production bundle                        |
-| `npm run start`          | Start the production server                        |
-| `npm run lint`           | Run ESLint                                         |
-| `npm run db:seed`        | Seed the database                                  |
-| `npx prisma migrate dev` | Run database migrations in development             |
-| `npx prisma db push`     | Push the schema to a remote database in production |
+| Command                          | Description                                              |
+| -------------------------------- | -------------------------------------------------------- |
+| `npm run dev`                    | Start the local development server                       |
+| `npm run build`                  | Build Cloudflare Workers-compatible output               |
+| `npm run deploy`                 | Build and deploy to Cloudflare                           |
+| `npm run preview`                | Preview locally with wrangler dev                        |
+| `npm run lint`                   | Run ESLint                                               |
+| `npm run db:seed`                | Seed the database                                        |
+| `npx prisma migrate dev`         | Run database migrations in development                   |
+| `wrangler d1 migrations apply`   | Push migrations to D1 database in production             |
 
 ## Directory Overview
 
@@ -147,11 +152,11 @@ components/
   admin/               Admin forms, tables, and upload components
   pages/               Page-level client components
 lib/
-  prisma.ts            Prisma client singleton
+  prisma.ts            Prisma client (D1 adapter / local dual mode)
   auth.ts              Password hashing and verification
   admin-auth.ts        Admin session signing and verification
-  blob.ts              Vercel Blob client and helpers
-  file-cleanup.ts      Upload cleanup for local and Blob storage
+  r2.ts                Cloudflare R2 S3 client and helpers
+  file-cleanup.ts      Upload cleanup for local and R2 storage
   site-config.ts       Global site configuration
   validation.ts        Zod validation rules
   api-utils.ts         API response helpers
@@ -165,71 +170,71 @@ public/
 
 ## Deployment
 
-The recommended stack is: Vercel + Turso + Vercel Blob.
+The recommended stack is: Cloudflare Pages + Cloudflare D1 + Cloudflare R2.
 
-### 1. Create a Turso Database
+### 1. Create a Cloudflare D1 Database
 
 ```bash
-# Install the Turso CLI
-curl -sSfL https://get.tur.so/install.sh | bash
+# Install the Wrangler CLI (if not already installed)
+npm install -g wrangler
 
-# Sign in and create a database
-turso auth signup
-turso db create miku-space
+# Log in to Cloudflare
+wrangler login
 
-# Get connection details
-turso db show miku-space --url
-turso db tokens create miku-space
+# Create a D1 database
+wrangler d1 create miku-space
 ```
 
-### 2. Migrate Local Data to Turso
+Copy the returned `database_id` into `wrangler.jsonc`.
+
+### 2. Migrate Local Data to D1
 
 ```bash
 # Export local SQLite data
 sqlite3 dev.db .dump > dump.sql
 
-# Import into Turso
-turso db shell miku-space < dump.sql
+# Import into D1
+wrangler d1 execute miku-space --remote --file=dump.sql
 ```
 
-### 3. Enable Vercel Blob
-
-1. Go to your Vercel project Settings → Storage
-2. Click Create Database and select the Blob type
-3. Once created, `BLOB_READ_WRITE_TOKEN` is automatically injected into your environment variables
-
-### 4. Deploy to Vercel
+### 3. Create a Cloudflare R2 Bucket
 
 ```bash
-# Install the Vercel CLI
-npm i -g vercel
-
-# Deploy from the project root
-vercel
+# Create an R2 bucket
+wrangler r2 bucket create miku-uploads
 ```
 
-Configure these values in Vercel project settings under Environment Variables:
+Then retrieve the API token and endpoint from Cloudflare Dashboard → R2, and set secrets via `wrangler secret put`.
 
-```text
-DATABASE_URL=libsql://xxx.turso.io
-DATABASE_AUTH_TOKEN=eyJ...
-ADMIN_SECRET=your-random-secret
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH=your-scrypt-hash
-SITE_URL=https://your-domain.com
-```
-
-### 5. Push the Schema to Production
+### 4. Deploy to Cloudflare Pages
 
 ```bash
-DATABASE_URL="libsql://xxx.turso.io" \
-DATABASE_AUTH_TOKEN="eyJ..." \
-npx prisma db push
+# Build and deploy
+npm run deploy
+```
+
+Set sensitive variables with `wrangler secret put`:
+
+```bash
+wrangler secret put ADMIN_SECRET
+wrangler secret put ADMIN_PASSWORD_HASH
+wrangler secret put R2_ACCESS_KEY_ID
+wrangler secret put R2_SECRET_ACCESS_KEY
+```
+
+### 5. Push the Schema to D1
+
+```bash
+# Generate migration SQL
+npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > init.sql
+
+# Apply to remote D1
+wrangler d1 execute miku-space --remote --file=init.sql
 ```
 
 ### 6. Bind a Domain
 
-Add your custom domain in Vercel project settings and follow the DNS instructions.
+In Cloudflare Dashboard → Pages → your project, add a custom domain. Cloudflare will automatically configure DNS and SSL.
 
 ## Security Notes
 

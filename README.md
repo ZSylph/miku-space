@@ -2,14 +2,15 @@
 
 一个基于 Next.js App Router 构建的个人博客与作品集站点，融合了内容发布、后台管理、全文搜索、SEO 优化、社交分享和主题切换等能力。项目采用清爽的青绿视觉语言，并围绕文章、笔记、作品、兴趣、音乐等内容模块组织信息结构，兼顾展示效果与日常维护效率。
 
-English documentation: [README.en.md](README.en.md)
+README：
+**[简体中文](README.md)** | **[English](README.en.md)**
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-19.2.6-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss)
 ![Prisma](https://img.shields.io/badge/Prisma-7.8.0-2D3748?logo=prisma)
-![SQLite](https://img.shields.io/badge/SQLite_/_libSQL-3-003B57?logo=sqlite)
+![SQLite](https://img.shields.io/badge/SQLite_/_D1-3-003B57?logo=sqlite)
 
 ## 项目特性
 
@@ -28,15 +29,15 @@ English documentation: [README.en.md](README.en.md)
 
 - 后台支持文章、笔记、作品、兴趣、歌曲等内容类型的创建、编辑、排序与删除。
 - 支持草稿 / 发布状态管理，便于内容分阶段上线。
-- 支持图片与音频上传，开发环境保存至本地 `public/uploads/`，生产环境自动切换至 Vercel Blob。
+- 支持图片与音频上传，开发环境保存至本地 `public/uploads/`，生产环境自动切换至 Cloudflare R2。
 - 支持拖拽排序与精选标记，适合维护首页和专题内容展示。
 - 后台登录采用基于 Cookie 的认证方案，并使用 HMAC 签名保护会话。
 
 ### 工程能力
 
-- 使用 Prisma + libSQL 适配器管理数据库，开发环境使用本地 SQLite，生产环境对接 Turso 云数据库。
-- 采用 Next.js Standalone 输出，适合 Vercel 或 Node.js 服务器部署。
-- 文件存储支持本地磁盘与 Vercel Blob 双模式，通过环境变量自动切换。
+- 使用 Prisma 管理数据库，开发环境使用本地 SQLite，生产环境通过 D1 adapter 对接 Cloudflare D1。
+- 通过 @opennextjs/cloudflare 适配，部署到 Cloudflare Workers 边缘网络。
+- 文件存储支持本地磁盘与 Cloudflare R2 双模式，通过环境变量自动切换。
 - 配置了 ESLint、TypeScript 与 Tailwind CSS 4 的现代前端工程链路。
 
 ## 技术栈
@@ -44,9 +45,9 @@ English documentation: [README.en.md](README.en.md)
 - **框架**: Next.js 16.2.6 (App Router, Turbopack)
 - **UI**: React 19, Tailwind CSS 4, Framer Motion, Lucide React
 - **内容**: React Markdown + remark-gfm
-- **数据库**: SQLite (dev) / Turso libSQL (prod)
-- **ORM**: Prisma 7.8.0 + @prisma/adapter-libsql
-- **存储**: 本地磁盘 (dev) / Vercel Blob (prod, @vercel/blob)
+- **数据库**: SQLite (dev) / Cloudflare D1 (prod)
+- **ORM**: Prisma 7.8.0 + @prisma/adapter-d1
+- **存储**: 本地磁盘 (dev) / Cloudflare R2 (prod, @aws-sdk/client-s3)
 - **类型**: TypeScript 5, Zod 校验
 
 ## 快速开始
@@ -82,12 +83,11 @@ npm run dev
 
 在项目根目录创建 `.env` 文件，按以下分组配置。
 
-### 数据库
+### 数据库（仅本地开发）
 
-| 变量名                | 必填     | 说明                                                              |
-| --------------------- | -------- | ----------------------------------------------------------------- |
-| `DATABASE_URL`        | 是       | 开发: `file:./dev.db`；生产: Turso 连接串 `libsql://xxx.turso.io` |
-| `DATABASE_AUTH_TOKEN` | 生产必填 | Turso 认证令牌，通过 `turso db tokens create <name>` 生成         |
+| 变量名         | 必填 | 说明                                    |
+| -------------- | ---- | --------------------------------------- |
+| `DATABASE_URL` | 是   | 开发: `file:./dev.db`，生产环境通过 D1 binding 连接，无需此变量 |
 
 ### 站点
 
@@ -103,13 +103,17 @@ npm run dev
 | `ADMIN_PASSWORD_HASH` | 是   | 密码 scrypt 哈希值                           |
 | `ADMIN_SECRET`        | 是   | Session Cookie HMAC 签名密钥，建议 64 位 hex |
 
-### Vercel Blob 对象存储（生产环境）
+### Cloudflare R2 对象存储（生产环境）
 
-| 变量名                    | 必填     | 说明                                                 |
-| ------------------------- | -------- | ---------------------------------------------------- |
-| `BLOB_READ_WRITE_TOKEN`   | 生产必填 | Vercel Blob 读写令牌，在 Vercel 项目 Storage 中自动获取 |
+| 变量名                 | 必填     | 说明                                      |
+| ---------------------- | -------- | ----------------------------------------- |
+| `R2_ENDPOINT`          | 生产必填 | R2 S3 兼容 API 端点                       |
+| `R2_ACCESS_KEY_ID`     | 生产必填 | R2 API Access Key ID                      |
+| `R2_SECRET_ACCESS_KEY` | 生产必填 | R2 API Secret Access Key                  |
+| `R2_BUCKET_NAME`       | 否       | Bucket 名称，默认 `miku-uploads`          |
+| `R2_PUBLIC_URL`        | 生产必填 | R2 公共访问地址                           |
 
-> 本地开发无需配置 Blob 变量，文件会自动保存到 `public/uploads/`。
+> 生产环境通过 `wrangler.jsonc` 配置 R2 binding 和 Secrets；本地开发无需配置，文件自动保存到 `public/uploads/`。
 
 ### 生成密钥
 
@@ -123,15 +127,16 @@ npx tsx -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ## 常用脚本
 
-| 命令                     | 说明                             |
-| ------------------------ | -------------------------------- |
-| `npm run dev`            | 启动开发服务器                   |
-| `npm run build`          | 构建生产版本                     |
-| `npm run start`          | 启动生产服务器                   |
-| `npm run lint`           | 运行 ESLint                      |
-| `npm run db:seed`        | 导入种子数据                     |
-| `npx prisma migrate dev` | 执行数据库迁移（开发）           |
-| `npx prisma db push`     | 推送 schema 到远程数据库（生产） |
+| 命令                     | 说明                                        |
+| ------------------------ | ------------------------------------------- |
+| `npm run dev`            | 启动本地开发服务器                          |
+| `npm run build`          | 构建 Cloudflare Workers 兼容产物            |
+| `npm run deploy`         | 构建并部署到 Cloudflare                     |
+| `npm run preview`        | 本地预览 Cloudflare Workers（wrangler dev） |
+| `npm run lint`           | 运行 ESLint                                 |
+| `npm run db:seed`        | 导入种子数据                                |
+| `npx prisma migrate dev` | 执行数据库迁移（开发）                      |
+| `wrangler d1 migrations apply` | 推送迁移到 D1 数据库（生产）         |
 
 ## 目录结构
 
@@ -157,11 +162,11 @@ components/
   admin/               后台表单、表格与上传组件
   pages/               搜索等页面级客户端组件
 lib/
-  prisma.ts            Prisma 客户端单例（libSQL 适配器）
+  prisma.ts            Prisma 客户端（D1 adapter / 本地双模式）
   auth.ts              密码 scrypt 哈希与验证
   admin-auth.ts        后台 HMAC 会话签发与校验
-  blob.ts              Vercel Blob 客户端与操作
-  file-cleanup.ts      上传文件孤儿清理（本地/Blob 双模式）
+  r2.ts                Cloudflare R2 S3 客户端与操作
+  file-cleanup.ts      上传文件孤儿清理（本地/R2 双模式）
   site-config.ts       站点全局配置（社交链接、SEO 等）
   validation.ts        Zod 表单校验规则
   api-utils.ts         API 响应辅助函数
@@ -186,71 +191,71 @@ public/
 
 ## 部署指南
 
-推荐部署方案：**Vercel + Turso + Vercel Blob**。
+推荐部署方案：**Cloudflare Pages + Cloudflare D1 + Cloudflare R2**。
 
-### 1. 创建 Turso 数据库
+### 1. 创建 Cloudflare D1 数据库
 
 ```bash
-# 安装 Turso CLI
-curl -sSfL https://get.tur.so/install.sh | bash
+# 安装 Wrangler CLI（如未安装）
+npm install -g wrangler
 
-# 登录并创建数据库
-turso auth signup
-turso db create miku-space
+# 登录 Cloudflare
+wrangler login
 
-# 获取连接信息
-turso db show miku-space --url
-turso db tokens create miku-space
+# 创建 D1 数据库
+wrangler d1 create miku-space
 ```
 
-### 2. 迁移本地数据到 Turso
+创建完成后将返回的 `database_id` 填入 `wrangler.jsonc`。
+
+### 2. 迁移本地数据到 D1
 
 ```bash
 # 导出本地 SQLite 数据
 sqlite3 dev.db .dump > dump.sql
 
-# 导入到 Turso
-turso db shell miku-space < dump.sql
+# 导入到 D1
+wrangler d1 execute miku-space --remote --file=dump.sql
 ```
 
-### 3. 启用 Vercel Blob
-
-1. 进入 Vercel 项目 Settings → Storage
-2. 点击 Create Database，选择 Blob 类型
-3. 创建完成后，`BLOB_READ_WRITE_TOKEN` 会自动注入到项目环境变量中
-
-### 4. 部署到 Vercel
+### 3. 创建 Cloudflare R2 Bucket
 
 ```bash
-# 安装 Vercel CLI
-npm i -g vercel
-
-# 在项目根目录部署
-vercel
+# 创建 R2 存储桶
+wrangler r2 bucket create miku-uploads
 ```
 
-在 Vercel 项目 Settings > Environment Variables 中配置：
+然后在 Cloudflare Dashboard → R2 中获取 API Token 和 Endpoint，并通过 `wrangler secret put` 设置 Secrets。
 
-```
-DATABASE_URL=libsql://xxx.turso.io
-DATABASE_AUTH_TOKEN=eyJ...
-ADMIN_SECRET=your-random-secret
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH=your-scrypt-hash
-SITE_URL=https://your-domain.com
-```
-
-### 5. 推送 Schema 到生产数据库
+### 4. 部署到 Cloudflare Pages
 
 ```bash
-DATABASE_URL="libsql://xxx.turso.io" \
-DATABASE_AUTH_TOKEN="eyJ..." \
-npx prisma db push
+# 构建并部署
+npm run deploy
+```
+
+通过 `wrangler secret put` 设置敏感变量：
+
+```bash
+wrangler secret put ADMIN_SECRET
+wrangler secret put ADMIN_PASSWORD_HASH
+wrangler secret put R2_ACCESS_KEY_ID
+wrangler secret put R2_SECRET_ACCESS_KEY
+```
+
+### 5. 推送 Schema 到 D1
+
+```bash
+# 生成迁移 SQL
+npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > init.sql
+
+# 应用到远程 D1
+wrangler d1 execute miku-space --remote --file=init.sql
 ```
 
 ### 6. 域名绑定
 
-在 Vercel 项目 Settings > Domains 中添加自定义域名，按提示配置 DNS 记录。
+在 Cloudflare Dashboard → Pages → 项目中绑定自定义域名，Cloudflare 会自动配置 DNS 和 SSL。
 
 ## 安全说明
 
@@ -261,11 +266,11 @@ npx prisma db push
 
 ## 维护建议
 
-- 修改后台账号或密钥后，请同步更新 Vercel 环境变量并重新部署。
-- 调整 Prisma Schema 后，执行 `npx prisma db push`（生产）或 `npx prisma migrate dev`（开发）。
+- 修改后台账号或密钥后，请通过 `wrangler secret put` 更新 Secrets 并重新部署。
+- 调整 Prisma Schema 后，执行 `npx prisma migrate diff` 生成迁移 SQL，再通过 `wrangler d1 migrations apply`（生产）或 `npx prisma migrate dev`（开发）应用。
 - 如果启用了自定义域名或外部图片源，请确认 `next.config.ts` 的 `remotePatterns` 与部署域名一致。
-- 上传文件在本地开发时保存到 `public/uploads/`，生产环境自动使用 Vercel Blob，无需修改代码。
+- 上传文件在本地开发时保存到 `public/uploads/`，生产环境自动使用 Cloudflare R2，无需修改代码。
 
 ## 许可证
 
-[MIT](LICENSE)
+本项目遵循 [MIT license](https://mit-license.org/) 开源协议，详细查看 [LICENSE](./LICENSE) 文件
