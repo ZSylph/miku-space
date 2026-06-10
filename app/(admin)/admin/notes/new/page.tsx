@@ -13,7 +13,7 @@ import {
   adminPrimaryButton,
   adminSecondaryButton,
   adminCheckboxClass,
-} from "@/lib/admin-styles";
+} from "@/components/admin/styles";
 import { makeSlug } from "@/lib/utils";
 
 export default function NewNotePage() {

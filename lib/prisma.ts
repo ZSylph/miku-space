@@ -63,13 +63,31 @@ export function getPrisma(): PrismaClient {
 }
 
 /**
- * Backwards-compatible named export.
- * In local dev this returns the singleton PrismaClient.
- * In production callers should prefer getPrisma() so the
- * correct D1 binding is used per-request.
+ * Convenience re-export for local development and build-time codegen.
+ *
+ * ⚠️  In production (Cloudflare Workers), this proxy delegates to `getPrisma()`
+ *     on every property access, ensuring the correct per-request D1 binding
+ *     is used. However, because it is a Proxy, some operations do not work
+ *     as expected:
+ *
+ *     - `prisma instanceof PrismaClient` → false
+ *     - `Object.keys(prisma)` → empty array
+ *     - `prisma.$extends(...)` → may not behave correctly
+ *
+ *     For production route handlers, prefer `const p = getPrisma()` and use
+ *     the returned instance directly.
  */
 export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
   get(_target, prop, receiver) {
     return Reflect.get(getPrisma(), prop, receiver);
+  },
+  has(_target, prop) {
+    return Reflect.has(getPrisma(), prop);
+  },
+  getOwnPropertyDescriptor(_target, prop) {
+    return Reflect.getOwnPropertyDescriptor(getPrisma(), prop);
+  },
+  ownKeys() {
+    return Reflect.ownKeys(getPrisma());
   },
 });

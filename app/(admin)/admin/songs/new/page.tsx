@@ -13,7 +13,7 @@ import {
   adminPrimaryButton,
   adminSecondaryButton,
   adminCheckboxClass,
-} from "@/lib/admin-styles";
+} from "@/components/admin/styles";
 
 export default function NewSongPage() {
   const router = useRouter();

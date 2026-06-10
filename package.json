@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest",
+    "test:ci": "vitest run",
     "postinstall": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
     "cf:build": "opennextjs-cloudflare build",
@@ -46,12 +48,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.8",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
     "typescript": "^5",
+    "vitest": "^4.1.8",
     "wrangler": "^4.99.0"
   }
 }

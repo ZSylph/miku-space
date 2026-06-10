@@ -10,7 +10,7 @@ import {
   adminPrimaryButton,
   adminSecondaryButton,
   adminCheckboxClass,
-} from "@/lib/admin-styles";
+} from "@/components/admin/styles";
 
 export default function NewInterestPage() {
   const router = useRouter();
