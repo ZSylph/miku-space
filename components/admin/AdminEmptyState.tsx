@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import { adminCardBase } from "@/components/admin/styles";
 
 interface AdminEmptyStateProps {
   icon: React.ReactNode;

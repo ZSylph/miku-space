@@ -15,7 +15,7 @@ import {
   adminPrimaryButton,
   adminSecondaryButton,
   adminCheckboxClass,
-} from "@/lib/admin-styles";
+} from "@/components/admin/styles";
 
 type PostApi = Jsonified<Post>;
 

@@ -119,7 +119,7 @@ npm run dev
 
 ```bash
 # 生成密码哈希
-npx tsx -e "console.log(require('./lib/auth').hashPassword('your-password'))"
+npx tsx scripts/hash-password.ts your-password
 
 # 生成 ADMIN_SECRET
 npx tsx -e "console.log(require('crypto').randomBytes(32).toString('hex'))"

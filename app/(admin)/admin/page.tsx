@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import { adminCardBase } from "@/components/admin/styles";
 import {
   FileText,
   StickyNote,

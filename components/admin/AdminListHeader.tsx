@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { adminCardBase } from "@/lib/admin-styles";
+import { adminCardBase } from "@/components/admin/styles";
 
 interface AdminListHeaderProps {
   icon: React.ReactNode;
