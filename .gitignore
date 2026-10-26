@@ -22,7 +22,15 @@
 
 # misc
 .DS_Store
+Thumbs.db
+ehthumbs.db
 *.pem
+
+# editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # debug
 npm-debug.log*
@@ -59,8 +67,11 @@ next-env.d.ts
 *.db-shm
 *.db-journal
 
+# ai tooling (local agent workspace, not part of the project)
+.reasonix/
+
 # logs
-dev-server.log
+*.log
 
 # deployment helpers (contain real secrets)
 vercel-env-paste.txt
